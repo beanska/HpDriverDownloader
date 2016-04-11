@@ -1,4 +1,5 @@
-﻿<#
+﻿#requires -Version 5.0
+<#
 	.SYNOPSIS
 		Downloads Softpaqs from HP Inc for each operating system and model specified.
 	
@@ -31,7 +32,7 @@ param
 			   ValueFromPipelineByPropertyName = $true)]
 	[String]$outDir = "$PSScriptRoot\Softpaqs"
 )
-requires -Version 2.0
+
 Import-Module PSFTP
 
 $processedFile = "$PSScriptRoot\AlreadyProcessed.txt"
@@ -61,8 +62,8 @@ function main {
 	$myModel = $config.Model
 	
 	# Import catalog
-	DownloadCatalog ($outDir)
-	$catalog = ([xml](gc "$outDir\Catalog\ProductCatalog\modelcatalog.xml")).DocumentElement.ProductCatalog
+	DownloadCatalog ("$outDir")
+	$catalog = ([xml](gc "$outDir\ProductCatalog\modelcatalog.xml")).DocumentElement.ProductCatalog
 	
 	#Load chosen options
 	[array]$selectOS = $catalog.OperatingSystem | where {$myOs -contains $_.Name}
@@ -73,7 +74,7 @@ function main {
 			$currentModels = (($myModel | ? {$_.HP -eq $model.Name}).bios)
 			write-verbose "Checking model ""$($model.Name)"""
 
-			[xml]$modelXml = gc "$outDir\Catalog\ProductCatalog\$($model.Id).xml"
+			[xml]$modelXml = gc "$outDir\ProductCatalog\$($model.Id).xml"
 			# For each OS
 			foreach ($o in $modelXml.NewDataSet.ProductCatalog.ProductModel.OS) {
 				write-debug "`tOS $($o.Id) > $($selectOS.Id)"
@@ -150,7 +151,7 @@ function DownloadCatalog {
 	FtpDownload -Credentials $mycreds -Destination $DownloadDir -RemoteFile $ProductCatalogUrl
 	
 	Write-Verbose "Extracting catalog to $DownloadDir"
-	Expand-Archive "$DownloadDir\ProductCatalog.zip"  $DownloadDir
+	Expand-Archive "$DownloadDir\ProductCatalog.zip"  $DownloadDir -Force
 	
 	Remove-Item "$DownloadDir\ProductCatalog.zip"
 	
