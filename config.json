@@ -1,0 +1,298 @@
+{
+	"Language": ['English - International'],
+    "OS":  [
+               "Microsoft Windows 10 64-Bit",
+               "Microsoft Windows 7 Enterprise 64 Edition",
+               "Microsoft Windows 8.1 64-bit Enterprise"
+           ],
+    "Model":  [
+                  {
+						"BIOS":  "HP 250 G2 Notebook PC",
+						"HP":  "HP 250 G2 Notebook PC"
+					},
+					{
+						"BIOS":  "HP Blade PC bc2800",
+						"HP":  "HP BladeSystem bc2800 Blade PC"
+					},
+					{
+						"BIOS":  "HP Compaq 6005 Pro Microtower",
+						"HP":  "HP Compaq 6005 Pro Microtower PC"
+					},
+					{
+						"BIOS":  "HP Compaq 6005 Pro MT PC",
+						"HP":  "HP Compaq 6005 Pro Microtower PC"
+					},
+					{
+						"BIOS":  "HP Compaq 6005 Pro SFF PC",
+						"HP":  "HP Compaq 6005 Pro Small Form Factor PC"
+					},
+					{
+						"BIOS":  "HP Compaq 6200 Pro MT PC",
+						"HP":  "HP Compaq 6200 Pro Microtower PC"
+					},
+					{
+						"BIOS":  "HP Compaq 8200 Elite SFF PC",
+						"HP":  "HP Compaq 8200 Elite Small Form Factor PC"
+					},
+					{
+						"BIOS":  "HP Compaq 8710p",
+						"HP":  "HP Compaq 8710p Notebook PC"
+					},
+					{
+						"BIOS":  "HP Compaq 8710p (KG912US#ABA)",
+						"HP":  "HP Compaq 8710p Notebook PC"
+					},
+					{
+						"BIOS":  "HP Compaq dc5100 MT(PM213AV)",
+						"HP":  "HP Compaq dc5100 Microtower PC"
+					},
+					{
+						"BIOS":  "HP Compaq dc5750 Microtower",
+						"HP":  "HP Compaq dc5750 Microtower PC"
+					},
+					{
+						"BIOS":  "HP Compaq dc5750 Small Form Factor",
+						"HP":  "HP Compaq dc5750 Small Form Factor PC"
+					},
+					{
+						"BIOS":  "HP Compaq dc5850 Microtower",
+						"HP":  "HP Compaq dc5850 Microtower PC"
+					},
+					{
+						"BIOS":  "HP Compaq dc5850 Small Form Factor",
+						"HP":  "HP Compaq dc5850 Small Form Factor PC"
+					},
+					{
+						"BIOS":  "HP Compaq dc7900 Ultra-Slim Desktop",
+						"HP":  "HP Compaq dc7900 Ultra-Slim Desktop PC"
+					},
+					{
+						"BIOS":  "HP Compaq Elite 8300 All-in-One PC",
+						"HP":  "HP Compaq Elite 8300 All-in-One PC"
+					},
+					{
+						"BIOS":  "HP Compaq Elite 8300 CMT",
+						"HP":  "HP Compaq Elite 8300 Convertible Minitower PC"
+					},
+					{
+						"BIOS":  "HP Compaq Elite 8300 SFF",
+						"HP":  "HP Compaq Elite 8300 Small Form Factor PC"
+					},
+					{
+						"BIOS":  "HP Compaq Elite 8300 USDT",
+						"HP":  "HP Compaq Elite Ultra-slim PC"
+					},
+					{
+						"BIOS":  "HP Compaq Pro 6300 SFF",
+						"HP":  "HP Compaq Pro 6300 Small Form Factor PC"
+					},
+					{
+						"BIOS":  "HP COMPAQ PRO 6305 MICROTOWER",
+						"HP":  "HP Compaq Pro 6305 Microtower PC"
+					},
+					{
+						"BIOS":  "HP Compaq Pro 6305 MT",
+						"HP":  "HP Compaq Pro 6305 Microtower PC"
+					},
+					{
+						"BIOS":  "HP Compaq Pro 6305 SFF",
+						"HP":  "HP Compaq Pro 6305 Small Form Factor PC"
+					},
+					{
+						"BIOS":  "HP EliteBook 6930p",
+						"HP":  "HP EliteBook 6930p Notebook PC"
+					},
+					{
+						"BIOS":  "HP EliteBook 820 G1",
+						"HP":  "HP EliteBook 820 G1 Notebook PC"
+					},
+					{
+						"BIOS":  "HP EliteBook 8460p",
+						"HP":  "HP EliteBook 8460p Notebook PC"
+					},
+					{
+						"BIOS":  "HP EliteBook 8470p",
+						"HP":  "HP EliteBook 8470p Notebook PC"
+					},
+					{
+						"BIOS":  "HP EliteBook 8530p",
+						"HP":  "HP EliteBook 8530p Notebook PC"
+					},
+					{
+						"BIOS":  "HP EliteBook 8540p",
+						"HP":  "HP EliteBook 8540p Notebook PC"
+					},
+					{
+						"BIOS":  "HP EliteBook 8560p",
+						"HP":  "HP EliteBook 8560p Notebook PC"
+					},
+					{
+						"BIOS":  "HP EliteBook 8570p",
+						"HP":  "HP EliteBook 8570p Notebook PC"
+					},
+					{
+						"BIOS":  "HP EliteBook 8570w",
+						"HP":  "HP EliteBook 8570w Mobile Workstation"
+					},
+					{
+						"BIOS":  "HP EliteBook 8730w",
+						"HP":  "HP EliteBook 8730w Mobile Workstation"
+					},
+					{
+						"BIOS":  "HP EliteBook 8740w",
+						"HP":  "HP EliteBook 8740w Mobile Workstation"
+					},
+					{
+						"BIOS":  "HP EliteBook 8760w",
+						"HP":  "HP EliteBook 8760w Mobile Workstation"
+					},
+					{
+						"BIOS":  "HP EliteBook 8770w",
+						"HP":  "HP EliteBook 8770w Mobile Workstation"
+					},
+					{
+						"BIOS":  "HP EliteBook Folio 1040 G1",
+						"HP":  "HP EliteBook Folio 1040 G1 Notebook PC"
+					},
+					{
+						"BIOS":  "HP EliteBook Folio 9470m",
+						"HP":  "HP EliteBook Folio 9470m Notebook PC"
+					},
+					{
+						"BIOS":  "HP EliteBook Folio 9480m",
+						"HP":  "HP EliteBook Folio 9480m Notebook PC"
+					},
+					{
+						"BIOS":  "HP EliteBook Revolve 810 G1",
+						"HP":  "HP EliteBook Revolve 810 G1 Tablet"
+					},
+					{
+						"BIOS":  "HP EliteBook Revolve 810 G2",
+						"HP":  "HP EliteBook Revolve 810 G2 Tablet"
+					},
+					{
+						"BIOS":  "HP EliteBook Revolve 810 G3",
+						"HP":  "HP EliteBook Revolve 810 G3 Tablet"
+					},
+					{
+						"BIOS":  "HP EliteDesk 705 G1 MT",
+						"HP":  "HP EliteDesk 705 G1 Microtower PC"
+					},
+					{
+						"BIOS":  "HP EliteDesk 705 G1 SFF",
+						"HP":  "HP EliteDesk 705 G1 Small Form Factor PC"
+					},
+					{
+						"BIOS":  "HP EliteDesk 800 G1 SFF",
+						"HP":  "HP EliteDesk 800 G1 Base Model Small Form Factor PC"
+					},
+					{
+						"BIOS":  "HP EliteDesk 800 G1 USDT",
+						"HP":  "HP EliteDesk 800 G1 Base Model Ultra-slim PC"
+					},
+					{
+						"BIOS":  "HP ElitePad 1000 G2",
+						"HP":  "HP ElitePad 1000 G2 Tablet"
+					},
+					{
+						"BIOS":  "HP ElitePad 900",
+						"HP":  "HP ElitePad 900 G1 Tablet"
+					},
+					{
+						"BIOS":  "HP Folio 13 - 2000 Notebook PC",
+						"HP":  "HP Folio 13 Notebook PC"
+					},
+					{
+						"BIOS":  "HP Mini 5103",
+						"HP":  "HP Mini 5103"
+					},
+					{
+						"BIOS":  "HP ProBook 450 G1",
+						"HP":  "HP ProBook 450 G1 Notebook PC"
+					},
+					{
+						"BIOS":  "HP ProBook 4540s",
+						"HP":  "HP ProBook 4540s Notebook PC"
+					},
+					{
+						"BIOS":  "HP ProBook 640 G1",
+						"HP":  "HP ProBook 640 G1 Notebook PC"
+					},
+					{
+						"BIOS":  "HP ProBook 645 G1",
+						"HP":  "HP ProBook 645 G1 Notebook PC"
+					},
+					{
+						"BIOS":  "HP ProBook 650 G1",
+						"HP":  "HP ProBook 650 G1 Notebook PC"
+					},
+					{
+						"BIOS":  "HP ProBook 655 G1",
+						"HP":  "HP ProBook 655 G1 Notebook PC"
+					},
+					{
+						"BIOS":  "HP ProBook 6550b",
+						"HP":  "HP ProBook 6550b  Notebook PC"
+					},
+					{
+						"BIOS":  "HP ProBook 6560b",
+						"HP":  "HP ProBook 6560b  Notebook PC"
+					},
+					{
+						"BIOS":  "HP ProBook 6570b",
+						"HP":  "HP ProBook 6570b Notebook PC"
+					},
+					{
+						"BIOS":  "HP ProDesk 400 G1 MT",
+						"HP":  "HP ProDesk 400 G1 Microtower PC"
+					},
+					{
+						"BIOS":  "HP ProDesk 600 G1 DM",
+						"HP":  "HP ProDesk 600 G1 Desktop Mini PC"
+					},
+					{
+						"BIOS":  "HP ProDesk 600 G1 SFF",
+						"HP":  "HP ProDesk 600 G1 Small Form Factor PC"
+					},
+					{
+						"BIOS":  "hp workstation xw6200",
+						"HP":  "HP xw6200 Workstation"
+					},
+					{
+						"BIOS":  "HP xw4400 Workstation",
+						"HP":  "HP xw4400 Workstation"
+					},
+					{
+						"BIOS":  "HP Z220 CMT Workstation",
+						"HP":  "HP Z220 Convertible Minitower Workstation"
+					},
+					{
+						"BIOS":  "HP Z230 Tower Workstation",
+						"HP":  "HP Z230 Tower Workstation"
+					},
+					{
+						"BIOS":  "HP Z400 Workstation",
+						"HP":  "HP Z400 Workstation"
+					},
+					{
+						"BIOS":  "HP Z420 Workstation",
+						"HP":  "HP Z420 Workstation"
+					},
+					{
+						"BIOS":  "HP Z440 Workstation",
+						"HP":  "HP Z440 Workstation"
+					},
+					{
+						"BIOS":  "HP Z600 Workstation",
+						"HP":  "HP Z600 Workstation"
+					},
+					{
+						"BIOS":  "HP Z620 Workstation",
+						"HP":  "HP Z620 Workstation"
+					},
+					{
+						"BIOS":  "HP ZBook 15 G2",
+						"HP":  "HP ZBook 15 G2 Mobile Workstation"
+					}
+              ]
+}
