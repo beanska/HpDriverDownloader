@@ -61,9 +61,13 @@ function main {
 	$myLang = $config.Language
 	$myModel = $config.Model
 	
+	
 	# Import catalog
 	DownloadCatalog ("$outDir")
 	$catalog = ([xml](gc "$outDir\ProductCatalog\modelcatalog.xml")).DocumentElement.ProductCatalog
+	
+	#TEST BUILD CATALOG
+	BuildConfig -Catalog $catalog -OutXML "$PSScriptRoot\config.xml"
 	
 	#Load chosen options
 	[array]$selectOS = $catalog.OperatingSystem | where {$myOs -contains $_.Name}
@@ -229,6 +233,39 @@ Function ExtractSoftpaq {
 	Write-Verbose "Extracting: ""$SoftpaqPath"" to ""$Destination"""
 	$args = @('-e', '-s', '-f', $Destination)
 	start-process $SoftpaqPath -ArgumentList $args -Wait -NoNewWindow
+}
+
+<#
+	.SYNOPSIS
+		Creates a default config based on current HP ProductCatalog.xml
+#>
+function BuildConfig
+{
+	param
+	(
+		[Parameter(Mandatory = $true, Position = 0)]
+		$Catalog,
+	
+		[Parameter(Mandatory = $true, Position = 1)]
+		$OutXML
+	)
+	
+	$template = @"
+	<?xml version="1.0"?>
+	<config>
+		<languages>
+		$(foreach ($l in ($catalog.Language.Name)) { "`t`t<language name=""$l"" enabled=""false"" />`n" })
+		</languages>
+		<operatingsystems>
+		$(foreach ($o in ($catalog.OperatingSystem.Name)) { "`t`t<os name=""$o"" enabled=""false"" />`n" })
+		</operatingsystems>
+		<models>
+		$(foreach ($m in ($catalog.ProductLine.ProductFamily.ProductModel.Name | where { $_.length -gt 0 })) { "`t`t<model name=""$m"" altname="""" enabled=""false"" />`n" })
+		</models>
+	</config>
+"@
+	
+	$template | Out-File $OutXML -force
 }
 
 main
