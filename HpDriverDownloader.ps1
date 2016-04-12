@@ -26,7 +26,7 @@ param
 (
 	[Parameter(ValueFromPipeline = $true,
 			   ValueFromPipelineByPropertyName = $true)]
-	[String]$cfgFile = "$PSScriptRoot\config.json",
+	[String]$cfgFile = "$PSScriptRoot\config.xml",
 	
 	[Parameter(ValueFromPipeline = $true,
 			   ValueFromPipelineByPropertyName = $true)]
@@ -43,7 +43,7 @@ $mycreds = New-Object System.Management.Automation.PSCredential ("anonymous", $s
 
 function main {
 	# Load config file
-	$config = gc $cfgFile | ConvertFrom-Json
+	$config = ([xml](gc "$PSScriptRoot\config.xml")).config
 	
 	#load softpaq that have already been processed
 	if (Test-Path $processedFile)
@@ -57,25 +57,21 @@ function main {
 	}
 	
 	#Set config items
-	$myOs = $config.Os
-	$myLang = $config.Language
-	$myModel = $config.Model
-	
+	$myOs = $config.operatingsystems.os | where { $_.enabled -eq 'true' }
+	$myLang = $config.languages.language | where { $_.enabled -eq 'true' }
+	$myModel = $config.models.model| where { $_.enabled -eq 'true' }
 	
 	# Import catalog
 	DownloadCatalog ("$outDir")
 	$catalog = ([xml](gc "$outDir\ProductCatalog\modelcatalog.xml")).DocumentElement.ProductCatalog
 	
-	#TEST BUILD CATALOG
-	BuildConfig -Catalog $catalog -OutXML "$PSScriptRoot\config.xml"
-	
 	#Load chosen options
-	[array]$selectOS = $catalog.OperatingSystem | where {$myOs -contains $_.Name}
-	[array]$selectLang = $catalog.Language | where {$myLang -contains $_.Name}
+	[array]$selectOS = $catalog.OperatingSystem | where {$myOs.name -contains $_.Name}
+	[array]$selectLang = $catalog.Language | where {$myLang.name -contains $_.Name}
 	
 	foreach ($model in $catalog.ProductLine.ProductFamily.ProductModel){
-		if ( ($myModel.HP -contains $model.Name) -and ($processedModels -notcontains $model.Name) ) {
-			$currentModels = (($myModel | ? {$_.HP -eq $model.Name}).bios)
+		if ( ($myModel.name -contains $model.Name) -and ($processedModels -notcontains $model.Name) ) {
+			$currentModels = (($myModel.name | ? {$_.HP -eq $model.Name}).altname)
 			write-verbose "Checking model ""$($model.Name)"""
 
 			[xml]$modelXml = gc "$outDir\ProductCatalog\$($model.Id).xml"
@@ -83,7 +79,6 @@ function main {
 			foreach ($o in $modelXml.NewDataSet.ProductCatalog.ProductModel.OS) {
 				write-debug "`tOS $($o.Id) > $($selectOS.Id)"
 				if ($selectOS.Id -contains $o.Id){
-
 					
 					# For each Language				
 					foreach ($l in $o.Lang){
