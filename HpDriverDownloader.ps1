@@ -52,13 +52,21 @@ function main {
 		Write-Output "You must enable Language, Model and OS in the config file for this script to do anything.`n""$cfgFile"""
 	}
 	
+	# Load configuration
 	$config = ([xml](gc "$PSScriptRoot\config.xml")).config
+	
+	# Load modelcatalog.xml into a hastable^2
 	$modelCatalog = Get-ModelCatalog -CatalogDir "$outDir\ProductCatalog"
+	
+	# Process the catalog against our configuration to build a processing queue
 	$queue = ProcessCatalog -ModelCatalog $modelCatalog -Config $config -CatalogDir "$outDir\ProductCatalog"
-	Write-output "Config($($config.length)) Model($($modelCatalog.length )) Queue($($queue.length))"
+	
+	# Download the requisite Softpaqs
+	DownloadandExtractSoftpaqs -Queue ([ref]$queue) -OutDir $outDir
+	
+	$queue | export-csv c:\Downloads\queue.csv -Force -NoTypeInformation
 	
 	
-	$queue
 	
 	<#
 	#load softpaq that have already been processed
@@ -162,6 +170,50 @@ function main {
 	#>
 } #main
 
+function DownloadandExtractSoftpaqs {
+	param
+	(
+		[Parameter(Mandatory = $true, Position = 1)]
+		[ref]$Queue,
+		[Parameter(Mandatory = $true, Position = 2)]
+		[string]$OutDir
+	)
+	
+	foreach ($sp in ($Queue.Value | select -Unique SoftpaqId, SoftpaqUrl, SoftpaqName)) {
+		$spFile = "$OutDir\Softpaq\sp$($sp.SoftpaqId).exe"
+		$spFldr = "$OutDir\Softpaq\sp$($sp.SoftpaqId)"
+		
+		#$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { Write-Verbose "$($_.SoftpaqId)"}
+		
+		# Download the SP if not already present
+		if (Test-Path -PathType Container -Path $spFldr) {
+			$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Extracted' }		
+		} elseif (Test-Path -Path $spFile) {
+			if (ExtractSoftpaq -SoftpaqPath $spFile -Destination $spFldr) {
+				$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Extracted' }
+			} else {
+				$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Error: Cannot extract' }
+			}
+		} else {
+
+			if (FtpDownload -RemoteFile $sp.SoftpaqUrl -Destination "$outDir\Softpaq" -Credentials $mycreds) {
+				#$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Downloaded' }
+				if (ExtractSoftpaq -SoftpaqPath $spFile -Destination $spFldr) {
+					$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Extracted' }
+					Remove-Item $spFile -Force
+				} else {
+					$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Error: Cannot extract' }
+				}
+			} else {
+				$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Download Error' }
+			}
+			
+			
+			
+		}
+		
+	} #foreach
+}
 
 function DownloadCatalog {
 	param (
@@ -214,7 +266,7 @@ function FtpDownload {
 	
 	$ftpServer = ($RemoteFile -split ('/'))[2]
 	$ftpPath = $RemoteFile -replace ("ftp://$ftpServer", "")
-	write-verbose "$ftpServer $ftpPath"
+	#write-verbose "$ftpServer $ftpPath"
 	
 	Try {
 		#Create folder to hold CVA files
@@ -232,12 +284,10 @@ function FtpDownload {
 		Get-FTPItem -Session $session -LocalPath $Destination -ErrorAction Stop -Path $ftpPath -Overwrite
 		
 		
-	}
-	Catch [System.IO.IOException] {
-		Write-Error "Unable to create CVA folder ""$CvaDir"""
-	}
-	Catch {
-		Write-Output $_.Exception
+	} Catch [System.IO.IOException] {
+		Write-Error "Unable to write file"
+	} Catch {
+		Write-Error $_.Exception
 	}
 }
 
@@ -248,9 +298,10 @@ Function ExtractSoftpaq {
 		[Parameter(Mandatory = $true, Position = 1)]
 		[string]$Destination
 	)
-	Write-Verbose "Extracting: ""$SoftpaqPath"" to ""$Destination"""
+	Write-Verbose "Extracting: ""$SoftpaqPath"""
 	$args = @('-e', '-s', '-f', $Destination)
-	start-process $SoftpaqPath -ArgumentList $args -Wait -NoNewWindow
+	$ret = start-process $SoftpaqPath -ArgumentList $args -Wait -NoNewWindow
+	return ($ret.ExitCode)
 }
 
 <#
@@ -262,7 +313,6 @@ function BuildConfig {
 	(
 		[Parameter(Mandatory = $true, Position = 0)]
 		$Catalog,
-	
 		[Parameter(Mandatory = $true, Position = 1)]
 		$OutXML
 	)
@@ -330,8 +380,7 @@ function New-XmlNodeHash {
 	foreach ($sub in $xmlNode) {
 		try {
 			$outHash.Add(($sub.$Key), $sub)
-		}
-		catch {
+		} catch {
 			#Write-Warning "Duplicate key $Key for $XmlNode"
 		}
 	}
@@ -360,21 +409,18 @@ function ProcessCatalog {
 	(
 		[Parameter(Mandatory = $true)]
 		[System.Xml.XmlElement]$Config,
-	
 		[Parameter(Mandatory = $true)]
 		[hashtable]$ModelCatalog,
-	
 		[Parameter(Mandatory = $true)]
 		[String]$CatalogDir
 	)
 	
 	$processedData = @()
 	
-	$cfgOs = $config.operatingsystems.os | where { $_.enabled -eq 'true' }
-	$cfgLng = $config.languages.language | where { $_.enabled -eq 'true' }
-	$cfgCat = $config.categories.category | where { $_.enabled -eq 'true' }
-	$cfgModel = $config.models.model | where { $_.enabled -eq 'true' }
-	Write-Verbose "$cfgOs"
+	$cfgOs = $Config.operatingsystems.os | where { $_.enabled -eq 'true' }
+	$cfgLng = $Config.languages.language | where { $_.enabled -eq 'true' }
+	$cfgCat = ($Config.categories.category | where { $_.enabled -eq 'true' })
+	$cfgModel = $Config.models.model | where { $_.enabled -eq 'true' }
 	
 	foreach ($file in (gci $catalogDir | where { $_.Name -ne 'modelcatalog.xml' } | where { $cfgModel.Id -contains $_.BaseName })) {
 		Write-Verbose "Processing catalog file $($file.Name)"
@@ -385,20 +431,25 @@ function ProcessCatalog {
 		where { $_.S -eq '0' }
 		
 		foreach ($sp in $SPs) {
-			$processedData += New-Object -TypeName PSObject -Property ([Ordered]@{
-				'LangId' = $sp.ParentNode.Id;
-				'LangName' = (($ModelCatalog.Languages)[$sp.ParentNode.Id]).Name
-				'OsId' = $sp.ParentNode.ParentNode.Id
-				'OsName' = ($ModelCatalog.OperatingSystems)[$sp.ParentNode.ParentNode.Id].Name
-				'OsShortName' = ($ModelCatalog.OperatingSystems)[$sp.ParentNode.ParentNode.Id].ssmname
-				'SoftpaqId' = $sp.Id
-				'SoftpaqName' = ($ModelCatalog.Softpaqs)[$sp.Id].Name
-				'SoftpaqUrl' = ($ModelCatalog.Softpaqs)[$sp.Id].Url
-				'ModelId' = $sp.ParentNode.ParentNode.ParentNode.Id
-				'ModelName' = ($ModelCatalog.Models)[$sp.ParentNode.ParentNode.ParentNode.Id].Name
-				'ModelCustomName' = ($ModelCatalog.Models)[$sp.ParentNode.ParentNode.ParentNode.Id].altname
-				'Status' = ''
-			});
+			if ( ($cfgCat.name) -contains (($ModelCatalog.Softpaqs)[$sp.Id].Category) ) {
+				$processedData += New-Object -TypeName PSObject -Property ([Ordered]@{
+					'LangId' = $sp.ParentNode.Id;
+					'LangName' = (($ModelCatalog.Languages)[$sp.ParentNode.Id]).Name
+					'OsId' = $sp.ParentNode.ParentNode.Id
+					'OsName' = ($ModelCatalog.OperatingSystems)[$sp.ParentNode.ParentNode.Id].Name
+					'OsShortName' = ($ModelCatalog.OperatingSystems)[$sp.ParentNode.ParentNode.Id].ssmname
+					'SoftpaqId' = $sp.Id
+					'SoftpaqName' = ($ModelCatalog.Softpaqs)[$sp.Id].Name
+					'SoftpaqUrl' = ($ModelCatalog.Softpaqs)[$sp.Id].Url
+					'SoftpaqCategory' = ($ModelCatalog.Softpaqs)[$sp.Id].Category
+					'SoftpaqVersion' = ($ModelCatalog.Softpaqs)[$sp.Id].Version
+					'ModelId' = $sp.ParentNode.ParentNode.ParentNode.Id
+					'ModelName' = ($ModelCatalog.Models)[$sp.ParentNode.ParentNode.ParentNode.Id].Name
+					'ModelCustomName' = ($ModelCatalog.Models)[$sp.ParentNode.ParentNode.ParentNode.Id].altname
+					'FileStatus' = ''
+					'Status' = ''
+				});
+			}
 		}
 	}
 	
