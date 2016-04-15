@@ -27,7 +27,6 @@ param
 	[Parameter(ValueFromPipeline = $true,
 			   ValueFromPipelineByPropertyName = $true)]
 	[String]$cfgFile = "$PSScriptRoot\config.xml",
-	
 	[Parameter(ValueFromPipeline = $true,
 			   ValueFromPipelineByPropertyName = $true)]
 	[String]$outDir = "$PSScriptRoot\Softpaqs"
@@ -42,33 +41,60 @@ $secpasswd = ConvertTo-SecureString "password" -AsPlainText -Force
 $mycreds = New-Object System.Management.Automation.PSCredential ("anonymous", $secpasswd)
 
 function main {
-	# Load config file
-	$config = ([xml](gc "$PSScriptRoot\config.xml")).config
 	
+	if (!(Test-Path "$outDir\ProductCatalog\modelcatalog.xml")) {
+		DownloadCatalog -DownloadDir $outDir
+		#TEST CATALOG VERSION HERE
+	}
+	
+	if (!(Test-Path $cfgFile)) {
+		BuildConfig -Catalog "$outDir\ProductCatalog\modelcatalog.xml" -OutXML $cfgFile
+		Write-Output "You must enable Language, Model and OS in the config file for this script to do anything.`n""$cfgFile"""
+	}
+	
+	$config = ([xml](gc "$PSScriptRoot\config.xml")).config
+	$modelCatalog = Get-ModelCatalog -CatalogDir "$outDir\ProductCatalog"
+	$queue = ProcessCatalog -ModelCatalog $modelCatalog -Config $config -CatalogDir "$outDir\ProductCatalog"
+	Write-output "Config($($config.length)) Model($($modelCatalog.length )) Queue($($queue.length))"
+	
+	
+	$queue
+	
+	<#
 	#load softpaq that have already been processed
-	if (Test-Path $processedFile)
-	{
+	if (Test-Path $processedFile) {
 		$processedSp = gc $processedFile
 	}
 	
-	if (Test-Path $procModelFile)
-	{
+	if (Test-Path $procModelFile) {
 		$processedModels = gc $procModelFile
 	}
-	
+	#>
 	#Set config items
-	$myOs = $config.operatingsystems.os | where { $_.enabled -eq 'true' }
-	$myLang = $config.languages.language | where { $_.enabled -eq 'true' }
-	$myModel = $config.models.model| where { $_.enabled -eq 'true' }
+	#$myOs = $config.operatingsystems.os | where { $_.enabled -eq 'true' }
+	#$myLang = $config.languages.language | where { $_.enabled -eq 'true' }
+	#$myModel = $config.models.model| where { $_.enabled -eq 'true' }
 	
 	# Import catalog
-	DownloadCatalog ("$outDir")
-	$catalog = ([xml](gc "$outDir\ProductCatalog\modelcatalog.xml")).DocumentElement.ProductCatalog
-	
+	############################DownloadCatalog ("$outDir")
+	<#
+	$data = @{ }
+	foreach ($model in ($config.models.model | where { $_.enabled -eq 'true' })) {
+		#$data.Add('ModelId', $model.Id)
+		foreach ($l in (([xml](gc "$outDir\ProductCatalog\$($model.Id).xml")).ProductCatalog.ProductModel)) {
+			$
+		}
+		
+		
+	}
+	Write-Host "end"
+	#>
 	#Load chosen options
-	[array]$selectOS = $catalog.OperatingSystem | where {$myOs.name -contains $_.Name}
-	[array]$selectLang = $catalog.Language | where {$myLang.name -contains $_.Name}
+	#[array]$selectOS = $catalog.OperatingSystem | where {$myOs.name -contains $_.Name}
+	#[array]$selectLang = $catalog.Language | where { $myLang.name -contains $_.Name }
+	#[array]$selectModels = $catalog.ProductLine.ProductFamily.ProductModel | where { $myLang.name -contains $_.Na }
 	
+	<#
 	foreach ($model in $catalog.ProductLine.ProductFamily.ProductModel){
 		if ( ($myModel.name -contains $model.Name) -and ($processedModels -notcontains $model.Name) ) {
 			$currentModels = (($myModel.name | ? {$_.HP -eq $model.Name}).altname)
@@ -133,13 +159,14 @@ function main {
 		    $model.Name | out-file $processedModels -Append
         } 
 	} #model
-
+	#>
 } #main
+
 
 function DownloadCatalog {
 	param (
-		[Parameter(Mandatory=$true, Position=0)]
-		[string] $DownloadDir
+		[Parameter(Mandatory = $true, Position = 0)]
+		[string]$DownloadDir
 	)
 	
 	Write-Verbose "Downloading catalog to $DownloadDir"
@@ -158,72 +185,68 @@ function DownloadCatalog {
 
 
 function ConnectFtp {
-    Param (
-    	[Parameter(Mandatory=$true, Position=0)]
-		[string] $SessionName,
-		
-		[Parameter(Mandatory=$true, Position=1)]
-		[ref] $Session,
-
-		[Parameter(Mandatory=$true, Position=2)]
+	Param (
+		[Parameter(Mandatory = $true, Position = 0)]
+		[string]$SessionName,
+		[Parameter(Mandatory = $true, Position = 1)]
+		[ref]$Session,
+		[Parameter(Mandatory = $true, Position = 2)]
 		$Credentials,
-
-        [Parameter(Mandatory=$true, Position=3)]
+		[Parameter(Mandatory = $true, Position = 3)]
 		$Site
-    )
-    $Session.value = Get-FTPConnection -Session MyTestSession
-    if ($Session.Value -eq $null){
-        $Session.value = Set-FTPConnection -Credentials $Credentials -Server $ftpServer -Session $SessionName -UsePassive -ErrorAction Stop 
-    }
+	)
+	$Session.value = Get-FTPConnection -Session MyTestSession
+	if ($Session.Value -eq $null) {
+		$Session.value = Set-FTPConnection -Credentials $Credentials -Server $ftpServer -Session $SessionName -UsePassive -ErrorAction Stop
+	}
 }
 
 function FtpDownload {
-	Param (	
-	
-		[Parameter(Mandatory=$true, Position=0)]
-		[string] $RemoteFile,
+	Param (
 		
-		[Parameter(Mandatory=$true, Position=1)]
-		[string] $Destination, 
-		
-		[Parameter(Mandatory=$true, Position=2)]
+		[Parameter(Mandatory = $true, Position = 0)]
+		[string]$RemoteFile,
+		[Parameter(Mandatory = $true, Position = 1)]
+		[string]$Destination,
+		[Parameter(Mandatory = $true, Position = 2)]
 		$Credentials
 	)
 	
-	$ftpServer = ($RemoteFile -split('/'))[2]
-	$ftpPath = $RemoteFile -replace("ftp://$ftpServer", "")
+	$ftpServer = ($RemoteFile -split ('/'))[2]
+	$ftpPath = $RemoteFile -replace ("ftp://$ftpServer", "")
 	write-verbose "$ftpServer $ftpPath"
 	
 	Try {
 		#Create folder to hold CVA files
-		if ( !(Test-Path $Destination) ){
+		if (!(Test-Path $Destination)) {
 			New-Item -ItemType directory -Path $Destination -ErrorAction Stop
 		}
 		
 		#Connect to FTP server
-        $Session = Get-FTPConnection -Session 'HP'
-        if ($Session -eq $null){
-            $Session = Set-FTPConnection -Credentials $Credentials -Server $ftpServer -Session 'HP' -UsePassive -ErrorAction Stop 
-        }
+		$Session = Get-FTPConnection -Session 'HP'
+		if ($Session -eq $null) {
+			$Session = Set-FTPConnection -Credentials $Credentials -Server $ftpServer -Session 'HP' -UsePassive -ErrorAction Stop
+		}
 		
 		#Download File
 		Get-FTPItem -Session $session -LocalPath $Destination -ErrorAction Stop -Path $ftpPath -Overwrite
-
 		
-	} Catch [System.IO.IOException] {
+		
+	}
+	Catch [System.IO.IOException] {
 		Write-Error "Unable to create CVA folder ""$CvaDir"""
-	} Catch {
+	}
+	Catch {
 		Write-Output $_.Exception
 	}
 }
 
 Function ExtractSoftpaq {
 	param (
-		[Parameter(Mandatory=$true, Position=0)]
-		[string] $SoftpaqPath,
-		
-		[Parameter(Mandatory=$true, Position=1)]
-		[string] $Destination
+		[Parameter(Mandatory = $true, Position = 0)]
+		[string]$SoftpaqPath,
+		[Parameter(Mandatory = $true, Position = 1)]
+		[string]$Destination
 	)
 	Write-Verbose "Extracting: ""$SoftpaqPath"" to ""$Destination"""
 	$args = @('-e', '-s', '-f', $Destination)
@@ -234,8 +257,7 @@ Function ExtractSoftpaq {
 	.SYNOPSIS
 		Creates a default config based on current HP ProductCatalog.xml
 #>
-function BuildConfig
-{
+function BuildConfig {
 	param
 	(
 		[Parameter(Mandatory = $true, Position = 0)]
@@ -246,21 +268,141 @@ function BuildConfig
 	)
 	
 	$template = @"
-	<?xml version="1.0"?>
-	<config>
-		<languages>
-		$(foreach ($l in ($catalog.Language.Name)) { "`t`t<language name=""$l"" enabled=""false"" />`n" })
-		</languages>
-		<operatingsystems>
-		$(foreach ($o in ($catalog.OperatingSystem.Name)) { "`t`t<os name=""$o"" enabled=""false"" />`n" })
-		</operatingsystems>
-		<models>
-		$(foreach ($m in ($catalog.ProductLine.ProductFamily.ProductModel.Name | where { $_.length -gt 0 })) { "`t`t<model name=""$m"" altname="""" enabled=""false"" />`n" })
-		</models>
-	</config>
+<?xml version="1.0"?>
+<config>
+	<languages>
+	$(foreach ($l in ($catalog.Language)) { "`t`t<language id=""$($l.Id)"" name=""$(Escape($l.Name))"" enabled=""false"" />`n" })
+	</languages>
+	<operatingsystems>
+	$(foreach ($o in ($catalog.OperatingSystem)) { "`t`t<os id=""$($o.Id)"" name=""$(Escape($o.Name))"" enabled=""false"" />`n" })
+	</operatingsystems>
+	<models>
+	$(foreach ($m in ($catalog.ProductLine.ProductFamily.ProductModel | where { $_ -ne $null })) {
+		"`t`t<model id=""$(Escape($m.Id))"" name=""$(Escape($m.Name))"" altname="""" enabled=""false"" />`n"
+	})
+	</models>
+	<categories>
+	$(foreach ($c in ($catalog.Softpaq.Category | select -Unique | sort)) { "`t`t<category name=""$(Escape($c))"" enabled=""false"" />`n" })
+	</categories>
+</config>
 "@
 	
 	$template | Out-File $OutXML -force
+}
+
+function Get-ModelCatalog {
+	[OutputType([hashtable])]
+	param
+	(
+		[Parameter(Mandatory = $true,
+				   Position = 1)]
+		[string]$CatalogDir
+	)
+	
+	$modelCatalogXml = ([xml](gc "$CatalogDir\modelcatalog.xml")).NewDataSet.ProductCatalog
+	$modelCatalog = @{ }
+	
+	Write-Verbose "Processing Softpaqs in ModelCatlog.xml"
+	$modelCatalog.Add('Softpaqs', (New-XmlNodeHash -XmlNode ($modelCatalogXml.Softpaq) -Key 'Id'))
+	
+	Write-Verbose "Processing Languages in ModelCatlog.xml"
+	$modelCatalog.Add('Languages', (New-XmlNodeHash -XmlNode ($modelCatalogXml.Language) -Key 'Id'))
+	
+	Write-Verbose "Processing Models in ModelCatlog.xml"
+	$modelCatalog.Add('Models', (New-XmlNodeHash -XmlNode ($modelCatalogXml.ProductLine.ProductFamily.ProductModel) -Key 'Id'))
+	
+	Write-Verbose "Processing Operating Systems in ModelCatlog.xml"
+	$modelCatalog.Add('OperatingSystems', (New-XmlNodeHash -XmlNode ($modelCatalogXml.OperatingSystem) -Key 'Id'))
+	
+	return $modelCatalog
+}
+
+function New-XmlNodeHash {
+	param
+	(
+		[Parameter(Mandatory = $true, Position = 1)]
+		[array]$XmlNode,
+		[Parameter(Mandatory = $true, Position = 2)]
+		[string]$Key
+	)
+	$outHash = @{ }
+	
+	foreach ($sub in $xmlNode) {
+		try {
+			$outHash.Add(($sub.$Key), $sub)
+		}
+		catch {
+			#Write-Warning "Duplicate key $Key for $XmlNode"
+		}
+	}
+	
+	return $outHash
+}
+
+<#
+	.SYNOPSIS
+		A brief description of the ProcessCatalog function.
+	
+	.DESCRIPTION
+		A detailed description of the ProcessCatalog function.
+	
+	.PARAMETER Config
+		Configuration data in XML
+	
+	.PARAMETER ModelCatalog
+		Hastable contain modelcatalog information
+	
+	.NOTES
+		Additional information about the function.
+#>
+function ProcessCatalog {
+	param
+	(
+		[Parameter(Mandatory = $true)]
+		[System.Xml.XmlElement]$Config,
+	
+		[Parameter(Mandatory = $true)]
+		[hashtable]$ModelCatalog,
+	
+		[Parameter(Mandatory = $true)]
+		[String]$CatalogDir
+	)
+	
+	$processedData = @()
+	
+	$cfgOs = $config.operatingsystems.os | where { $_.enabled -eq 'true' }
+	$cfgLng = $config.languages.language | where { $_.enabled -eq 'true' }
+	$cfgCat = $config.categories.category | where { $_.enabled -eq 'true' }
+	$cfgModel = $config.models.model | where { $_.enabled -eq 'true' }
+	Write-Verbose "$cfgOs"
+	
+	foreach ($file in (gci $catalogDir | where { $_.Name -ne 'modelcatalog.xml' } | where { $cfgModel.Id -contains $_.BaseName })) {
+		Write-Verbose "Processing catalog file $($file.Name)"
+		
+		$sps = ((([xml](gc $file.FullName)).NewDataSet.ProductCatalog.ProductModel.OS |
+		where { $cfgOs.id -contains $_.Id }).Lang |
+		where { $cfgLng.id -contains $_.Id }).SP |
+		where { $_.S -eq '0' }
+		
+		foreach ($sp in $SPs) {
+			$processedData += New-Object -TypeName PSObject -Property ([Ordered]@{
+				'LangId' = $sp.ParentNode.Id;
+				'LangName' = (($ModelCatalog.Languages)[$sp.ParentNode.Id]).Name
+				'OsId' = $sp.ParentNode.ParentNode.Id
+				'OsName' = ($ModelCatalog.OperatingSystems)[$sp.ParentNode.ParentNode.Id].Name
+				'OsShortName' = ($ModelCatalog.OperatingSystems)[$sp.ParentNode.ParentNode.Id].ssmname
+				'SoftpaqId' = $sp.Id
+				'SoftpaqName' = ($ModelCatalog.Softpaqs)[$sp.Id].Name
+				'SoftpaqUrl' = ($ModelCatalog.Softpaqs)[$sp.Id].Url
+				'ModelId' = $sp.ParentNode.ParentNode.ParentNode.Id
+				'ModelName' = ($ModelCatalog.Models)[$sp.ParentNode.ParentNode.ParentNode.Id].Name
+				'ModelCustomName' = ($ModelCatalog.Models)[$sp.ParentNode.ParentNode.ParentNode.Id].altname
+				'Status' = ''
+			});
+		}
+	}
+	
+	$processedData
 }
 
 main
