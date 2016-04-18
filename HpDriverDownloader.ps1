@@ -29,7 +29,10 @@ param
 	[String]$cfgFile = "$PSScriptRoot\config.xml",
 	[Parameter(ValueFromPipeline = $true,
 			   ValueFromPipelineByPropertyName = $true)]
-	[String]$outDir = "$PSScriptRoot\Softpaqs"
+	[String]$outDir = "$PSScriptRoot\Softpaqs",
+	[Parameter(ValueFromPipeline = $true,
+			   ValueFromPipelineByPropertyName = $true)]
+	[switch]$UseSymLinks = $false
 )
 
 Import-Module PSFTP
@@ -59,115 +62,23 @@ function main {
 	$modelCatalog = Get-ModelCatalog -CatalogDir "$outDir\ProductCatalog"
 	
 	# Process the catalog against our configuration to build a processing queue
-	$queue = ProcessCatalog -ModelCatalog $modelCatalog -Config $config -CatalogDir "$outDir\ProductCatalog"
+	$queue = (ProcessCatalog -ModelCatalog $modelCatalog -Config $config -CatalogDir "$outDir\ProductCatalog") |
+		group 'LangId', 'SoftpaqName', 'OsId', 'ModelId' |
+		Foreach-Object { $_.Group | Sort-Object SoftpaqVersionR | Select-Object -Last 1 }
 	
 	# Download the requisite Softpaqs
 	DownloadandExtractSoftpaqs -Queue ([ref]$queue) -OutDir $outDir
 	
-	$queue | export-csv c:\Downloads\queue.csv -Force -NoTypeInformation
-	
-	
-	
-	<#
-	#load softpaq that have already been processed
-	if (Test-Path $processedFile) {
-		$processedSp = gc $processedFile
+	if ($UseSymLinks) {
+		Create-JuntionPoints -Queue ([ref]$queue) -OutDir $outDir
+	} else {
+		CreatePathsAndCopyFiles -Queue ([ref]$queue) -OutDir $outDir
 	}
-	
-	if (Test-Path $procModelFile) {
-		$processedModels = gc $procModelFile
-	}
-	#>
-	#Set config items
-	#$myOs = $config.operatingsystems.os | where { $_.enabled -eq 'true' }
-	#$myLang = $config.languages.language | where { $_.enabled -eq 'true' }
-	#$myModel = $config.models.model| where { $_.enabled -eq 'true' }
-	
-	# Import catalog
-	############################DownloadCatalog ("$outDir")
-	<#
-	$data = @{ }
-	foreach ($model in ($config.models.model | where { $_.enabled -eq 'true' })) {
-		#$data.Add('ModelId', $model.Id)
-		foreach ($l in (([xml](gc "$outDir\ProductCatalog\$($model.Id).xml")).ProductCatalog.ProductModel)) {
-			$
-		}
 		
-		
-	}
-	Write-Host "end"
-	#>
-	#Load chosen options
-	#[array]$selectOS = $catalog.OperatingSystem | where {$myOs.name -contains $_.Name}
-	#[array]$selectLang = $catalog.Language | where { $myLang.name -contains $_.Name }
-	#[array]$selectModels = $catalog.ProductLine.ProductFamily.ProductModel | where { $myLang.name -contains $_.Na }
+	#$queue | group 'LangId', 'SoftpaqName', 'OsId', 'ModelId' |
+	#Foreach-Object { $_.Group | Sort-Object SoftpaqVersionR | Select-Object -Last 1 }
+	#| export-csv c:\Downloads\queue.csv -Force -NoTypeInformation
 	
-	<#
-	foreach ($model in $catalog.ProductLine.ProductFamily.ProductModel){
-		if ( ($myModel.name -contains $model.Name) -and ($processedModels -notcontains $model.Name) ) {
-			$currentModels = (($myModel.name | ? {$_.HP -eq $model.Name}).altname)
-			write-verbose "Checking model ""$($model.Name)"""
-
-			[xml]$modelXml = gc "$outDir\ProductCatalog\$($model.Id).xml"
-			# For each OS
-			foreach ($o in $modelXml.NewDataSet.ProductCatalog.ProductModel.OS) {
-				write-debug "`tOS $($o.Id) > $($selectOS.Id)"
-				if ($selectOS.Id -contains $o.Id){
-					
-					# For each Language				
-					foreach ($l in $o.Lang){
-						write-debug "`t`t Lang $($selectLang.Id) > $($l.id)"
-						if ($selectLang.Id -contains $l.id){
-							
-							#For each service paq  
-							foreach ( $sp in ($l.SP | ? { ($_.S -eq '0') }) ){
-                                Write-Debug "`t`t`t SP: $($sp.Id)"
-
-								foreach ($ssp in ($catalog.Softpaq | ? { ($_.Id -eq $sp.Id) -and ($_.Category -like "Driver*") })){
-                                    Write-Debug "`t`t`t`t SSP: $($ssp.Id)"
-									$spFile = "$outDir\softpaq\sp$($sp.id).exe"
-									$spDst = "$outDir\softpaq\$($sp.id)"
-									
-
-									# Did we already download this?
-									if ( !(Test-Path -PathType Container -Path $spDst) ) {
-										
-										FtpDownload -RemoteFile $ssp.URL -Destination "$outDir\Softpaq" -Credentials $mycreds
-										ExtractSoftpaq -SoftpaqPath $spFile -Destination $spDst
-										if (Test-Path $spDst){
-											Remove-Item $spFile -Force
-										}
-									} else {
-										#already downloaded
-									}
-									
-									#Create Path and copy drivers
-									foreach ($sos in ($selectOS | ? {$_.id -eq $o.id})){
-										foreach ($m in $currentModels){
-											$drvPath = "$outDir\$($sos.Name)\$m\$($ssp.Name)"
-											if ( !(Test-Path $drvPath) ){
-												New-Item -Path $drvPath -ItemType directory -ErrorAction Continue
-											
-												Copy-Item "$spDst\*" $drvPath -Recurse -ErrorAction Continue
-                                                write-verbose "Copying ""$spDst"" to ""$drvPath"""
-											}
-										}
-									}
-                                    
-                                    $ssp.id | Out-File $processedFile -Append
-                                    #$processedSp += $ssp.id
-                                    
-								}#Select SP
-                                    
-							} #SP
-						}
-					} #Lang
-				}
-			} #OS
-		    $model.Name | out-file $processedModels -Append
-        } 
-	} #model
-	#>
 } #main
 
 function DownloadandExtractSoftpaqs {
@@ -205,7 +116,7 @@ function DownloadandExtractSoftpaqs {
 					$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Error: Cannot extract' }
 				}
 			} else {
-				$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Download Error' }
+				$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Error: Unable to download' }
 			}
 			
 			
@@ -235,6 +146,17 @@ function DownloadCatalog {
 	
 }
 
+function String2Version {
+	param (
+		[string]$String
+	)
+	
+	$stringAry = $String.split('.')
+	$revAry = ($stringAry[3]).Split(' ')
+	$revStr = "$($revAry[0])".PadLeft(6, '0') + "$([int][char]("$($revAry[1])"))".PadLeft(2, '0') + "$($revAry[2])"
+	
+	return [version]"$($stringAry[0]).$($stringAry[1]).$($stringAry[2]).$revStr"
+}
 
 function ConnectFtp {
 	Param (
@@ -443,6 +365,8 @@ function ProcessCatalog {
 					'SoftpaqUrl' = ($ModelCatalog.Softpaqs)[$sp.Id].Url
 					'SoftpaqCategory' = ($ModelCatalog.Softpaqs)[$sp.Id].Category
 					'SoftpaqVersion' = ($ModelCatalog.Softpaqs)[$sp.Id].Version
+					'SoftpaqVersionR' = String2Version(($ModelCatalog.Softpaqs)[$sp.Id].Version)
+					'SoftpaqDir' = ''
 					'ModelId' = $sp.ParentNode.ParentNode.ParentNode.Id
 					'ModelName' = ($ModelCatalog.Models)[$sp.ParentNode.ParentNode.ParentNode.Id].Name
 					'ModelCustomName' = ($ModelCatalog.Models)[$sp.ParentNode.ParentNode.ParentNode.Id].altname
@@ -456,4 +380,204 @@ function ProcessCatalog {
 	$processedData
 }
 
+function Create-JuntionPoints {
+	param
+	(
+		[Parameter(Mandatory = $true, Position = 1)]
+		[ref]$Queue,
+	
+		[Parameter(Mandatory = $true, Position = 2)]
+		[string]$OutDir
+	)
+	
+	foreach ($entry in ($Queue.Value | where { $_.FileStatus -eq 'Extracted' })) {
+		$drvTitle = "$($entry.SoftpaqName) ($($entry.SoftpaqVersion))"
+		$symDir = "$outDir\$($entry.LangName)\$($entry.OsShortName)\$($entry.ModelName)"
+		$spDir = "$outDir\softpaq\sp$($entry.SoftpaqId)"
+		
+		if (!(Test-Path $symDir)) {
+			New-Item -Path $symDir -ItemType directory -ErrorAction Continue | Out-Null
+		}
+		
+		if (!(Test-Path "$symDir\$drvTitle" )) {
+			New-SymLink -Path $spDir -SymName "$symDir\$drvTitle" -Directory | Out-Null
+		}
+		
+	}
+	
+}
+
+function CreatePathsAndCopyFiles {
+	param
+	(
+		[Parameter(Mandatory = $true, Position = 1)]
+		[ref]$Queue,
+	
+		[Parameter(Mandatory = $true, Position = 2)]
+		[string]$OutDir
+	)
+	
+	#Create Path and copy drivers
+	#foreach ($sos in ($selectOS | ? { $_.id -eq $o.id })) {
+	foreach ($entry in ($Queue.Value | where {$_.FileStatus -eq 'Extracted' }) ) {
+		$drvPath = "$outDir\$($entry.LangName)\$($entry.OsShortName)\$($entry.ModelName)\$($entry.SoftpaqName) ( $($entry.SoftpaqVersion)))"
+		New-Item -Path $drvPath -ItemType directory -ErrorAction Continue
+		
+		
+		
+		<#foreach ($m in $currentModels) {
+			$drvPath = "$outDir\$($sos.Name)\$m\$($ssp.Name)"
+			if (!(Test-Path $drvPath)) {
+				New-Item -Path $drvPath -ItemType directory -ErrorAction Continue
+				
+				Copy-Item "$spDst\*" $drvPath -Recurse -ErrorAction Continue
+				write-verbose "Copying ""$spDst"" to ""$drvPath"""
+			}
+		}#>
+	}
+}
+
+function Supersede {
+	param (
+		[string]$ReferenceString,
+		[string]$DifferenceString
+	)
+	
+	$refAry = $ReferenceString.split('.').split(' ')
+	$difAry = $DifferenceString.split('.').split(' ')
+	
+	$max = ($refAry.length) - 1
+	
+	foreach ($i in 0..$max) {
+		if ($difAry[$i] -gt $refAry[$i]) {
+			$result = $true
+			break;
+		} else {
+			$result = $false
+		}
+	}
+	return $result
+}
+
+Function New-SymLink {
+    <#
+        .SYNOPSIS
+            Creates a Symbolic link to a file or directory
+
+        .DESCRIPTION
+            Creates a Symbolic link to a file or directory as an alternative to mklink.exe
+
+        .PARAMETER Path
+            Name of the path that you will reference with a symbolic link.
+
+        .PARAMETER SymName
+            Name of the symbolic link to create. Can be a full path/unc or just the name.
+            If only a name is given, the symbolic link will be created on the current directory that the
+            function is being run on.
+
+        .PARAMETER File
+            Create a file symbolic link
+
+        .PARAMETER Directory
+            Create a directory symbolic link
+
+        .NOTES
+            Name: New-SymLink
+            Author: Boe Prox
+            Created: 15 Jul 2013
+
+
+        .EXAMPLE
+            New-SymLink -Path "C:\users\admin\downloads" -SymName "C:\users\admin\desktop\downloads" -Directory
+
+            SymLink                          Target                   Type
+            -------                          ------                   ----
+            C:\Users\admin\Desktop\Downloads C:\Users\admin\Downloads Directory
+
+            Description
+            -----------
+            Creates a symbolic link to downloads folder that resides on C:\users\admin\desktop.
+
+        .EXAMPLE
+            New-SymLink -Path "C:\users\admin\downloads\document.txt" -SymName "SomeDocument" -File
+
+            SymLink                             Target                                Type
+            -------                             ------                                ----
+            C:\users\admin\desktop\SomeDocument C:\users\admin\downloads\document.txt File
+
+            Description
+            -----------
+            Creates a symbolic link to document.txt file under the current directory called SomeDocument.
+    #>
+	[cmdletbinding(
+				   DefaultParameterSetName = 'Directory',
+				   SupportsShouldProcess = $True
+				   )]
+	Param (
+		[parameter(Position = 0, ParameterSetName = 'Directory', ValueFromPipeline = $True,
+				   ValueFromPipelineByPropertyName = $True, Mandatory = $True)]
+		[parameter(Position = 0, ParameterSetName = 'File', ValueFromPipeline = $True,
+				   ValueFromPipelineByPropertyName = $True, Mandatory = $True)]
+		[ValidateScript({
+			If (Test-Path $_) { $True } Else {
+				Throw "`'$_`' doesn't exist!"
+			}
+		})]
+		[string]$Path,
+		[parameter(Position = 1, ParameterSetName = 'Directory')]
+		[parameter(Position = 1, ParameterSetName = 'File')]
+		[string]$SymName,
+		[parameter(Position = 2, ParameterSetName = 'File')]
+		[switch]$File,
+		[parameter(Position = 2, ParameterSetName = 'Directory')]
+		[switch]$Directory
+	)
+	Begin {
+		Try {
+			$null = [mklink.symlink]
+		} Catch {
+			Add-Type @"
+            using System;
+            using System.Runtime.InteropServices;
+ 
+            namespace mklink
+            {
+                public class symlink
+                {
+                    [DllImport("kernel32.dll")]
+                    public static extern bool CreateSymbolicLink(string lpSymlinkFileName, string lpTargetFileName, int dwFlags);
+                }
+            }
+"@
+		}
+	}
+	Process {
+		#Assume target Symlink is on current directory if not giving full path or UNC
+		If ($SymName -notmatch "^(?:[a-z]:\\)|(?:\\\\\w+\\[a-z]\$)") {
+			$SymName = "{0}\{1}" -f $pwd, $SymName
+		}
+		$Flag = @{
+			File = 0
+			Directory = 1
+		}
+		If ($PScmdlet.ShouldProcess($Path, 'Create Symbolic Link')) {
+			Try {
+				$return = [mklink.symlink]::CreateSymbolicLink($SymName, $Path, $Flag[$PScmdlet.ParameterSetName])
+				If ($return) {
+					$object = New-Object PSObject -Property @{
+						SymLink = $SymName
+						Target = $Path
+						Type = $PScmdlet.ParameterSetName
+					}
+					$object.pstypenames.insert(0, 'System.File.SymbolicLink')
+					$object
+				} Else {
+					Throw "Unable to create symbolic link!"
+				}
+			} Catch {
+				Write-warning ("{0}: {1}" -f $path, $_.Exception.Message)
+			}
+		}
+	}
+}
 main
