@@ -24,15 +24,17 @@
 [CmdletBinding()]
 param
 (
-	[Parameter(ValueFromPipeline = $true,
-			   ValueFromPipelineByPropertyName = $true)]
+	[Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
 	[String]$cfgFile = "$PSScriptRoot\config.xml",
-	[Parameter(ValueFromPipeline = $true,
-			   ValueFromPipelineByPropertyName = $true)]
+
+	[Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
 	[String]$outDir = "$PSScriptRoot\Softpaqs",
-	[Parameter(ValueFromPipeline = $true,
-			   ValueFromPipelineByPropertyName = $true)]
-	[switch]$UseSymLinks = $false
+
+	[Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
+	[switch]$UseSymLinks = $false,
+
+	[Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
+	[switch]$GenerateConfig = $false
 )
 
 Import-Module PSFTP
@@ -45,39 +47,49 @@ $mycreds = New-Object System.Management.Automation.PSCredential ("anonymous", $s
 
 function main {
 	
+	# Download catalog file if not present
 	if (!(Test-Path "$outDir\ProductCatalog\modelcatalog.xml")) {
 		DownloadCatalog -DownloadDir $outDir
 		#TEST CATALOG VERSION HERE
 	}
 	
-	if (!(Test-Path $cfgFile)) {
-		BuildConfig -Catalog "$outDir\ProductCatalog\modelcatalog.xml" -OutXML $cfgFile
-		Write-Output "You must enable Language, Model and OS in the config file for this script to do anything.`n""$cfgFile"""
-	}
-	
-	# Load configuration
-	$config = ([xml](gc "$PSScriptRoot\config.xml")).config
-	
-	# Load modelcatalog.xml into a hastable^2
-	$modelCatalog = Get-ModelCatalog -CatalogDir "$outDir\ProductCatalog"
-	
-	# Process the catalog against our configuration to build a processing queue
-	$queue = (ProcessCatalog -ModelCatalog $modelCatalog -Config $config -CatalogDir "$outDir\ProductCatalog") |
+	if ($GenerateConfig) {
+		if (Test-Path $cfgFile) {
+			Write-Error "Config file already exists ""$cfgFile"""
+		} else {
+			BuildConfig -Catalog "$outDir\ProductCatalog\modelcatalog.xml" -OutXML $cfgFile
+			Write-Output "You must enable Language, Model and OS in the config file for this script to do anything.`n""$cfgFile"""
+		}
+	} else {		
+		if (!(Test-Path $cfgFile)) {
+			BuildConfig -Catalog "$outDir\ProductCatalog\modelcatalog.xml" -OutXML $cfgFile
+			Write-Output "You must enable Language, Model and OS in the config file for this script to do anything.`n""$cfgFile"""
+		}
+		
+		# Load configuration
+		$config = ([xml](gc "$PSScriptRoot\config.xml")).config
+		
+		# Load modelcatalog.xml into a hastable^2
+		$modelCatalog = Get-ModelCatalog -CatalogDir "$outDir\ProductCatalog"
+		
+		# Process the catalog against our configuration to build a processing queue
+		$queue = (ProcessCatalog -ModelCatalog $modelCatalog -Config $config -CatalogDir "$outDir\ProductCatalog") |
 		group 'LangId', 'SoftpaqName', 'OsId', 'ModelId' |
 		Foreach-Object { $_.Group | Sort-Object SoftpaqVersionR | Select-Object -Last 1 }
-	
-	# Download the requisite Softpaqs
-	DownloadandExtractSoftpaqs -Queue ([ref]$queue) -OutDir $outDir
-	
-	if ($UseSymLinks) {
-		Create-JuntionPoints -Queue ([ref]$queue) -OutDir $outDir
-	} else {
-		Create-PathsAndCopyFiles -Queue ([ref]$queue) -OutDir $outDir
-	}
 		
-	#$queue | group 'LangId', 'SoftpaqName', 'OsId', 'ModelId' |
-	#Foreach-Object { $_.Group | Sort-Object SoftpaqVersionR | Select-Object -Last 1 }
-	#| export-csv c:\Downloads\queue.csv -Force -NoTypeInformation
+		# Download the requisite Softpaqs
+		DownloadandExtractSoftpaqs -Queue ([ref]$queue) -OutDir $outDir
+		
+		if ($UseSymLinks) {
+			Create-JuntionPoints -Queue ([ref]$queue) -OutDir $outDir
+		} else {
+			Create-PathsAndCopyFiles -Queue ([ref]$queue) -OutDir $outDir
+		}
+		
+		#$queue | group 'LangId', 'SoftpaqName', 'OsId', 'ModelId' |
+		#Foreach-Object { $_.Group | Sort-Object SoftpaqVersionR | Select-Object -Last 1 }
+		#| export-csv c:\Downloads\queue.csv -Force -NoTypeInformation
+	}
 	
 } #main
 
