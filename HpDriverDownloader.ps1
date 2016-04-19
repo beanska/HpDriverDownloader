@@ -10,7 +10,7 @@
 		+Requries PSFTP module (https://gallery.technet.microsoft.com/scriptcenter/PowerShell-FTP-Client-db6fe0cb)
 	
 	.PARAMETER cfgFile
-		JSON configuration file
+		XML configuration file
 	
 	.PARAMETER outDir
 		Folder to place the downloaded softpaqs. There will be duplicates. DeDupe strongly encouraged.
@@ -72,7 +72,7 @@ function main {
 	if ($UseSymLinks) {
 		Create-JuntionPoints -Queue ([ref]$queue) -OutDir $outDir
 	} else {
-		CreatePathsAndCopyFiles -Queue ([ref]$queue) -OutDir $outDir
+		Create-PathsAndCopyFiles -Queue ([ref]$queue) -OutDir $outDir
 	}
 		
 	#$queue | group 'LangId', 'SoftpaqName', 'OsId', 'ModelId' |
@@ -93,9 +93,7 @@ function DownloadandExtractSoftpaqs {
 	foreach ($sp in ($Queue.Value | select -Unique SoftpaqId, SoftpaqUrl, SoftpaqName)) {
 		$spFile = "$OutDir\Softpaq\sp$($sp.SoftpaqId).exe"
 		$spFldr = "$OutDir\Softpaq\sp$($sp.SoftpaqId)"
-		
-		#$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { Write-Verbose "$($_.SoftpaqId)"}
-		
+			
 		# Download the SP if not already present
 		if (Test-Path -PathType Container -Path $spFldr) {
 			$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Extracted' }		
@@ -106,21 +104,15 @@ function DownloadandExtractSoftpaqs {
 				$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Error: Cannot extract' }
 			}
 		} else {
-
-			if (FtpDownload -RemoteFile $sp.SoftpaqUrl -Destination "$outDir\Softpaq" -Credentials $mycreds) {
-				#$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Downloaded' }
-				if (ExtractSoftpaq -SoftpaqPath $spFile -Destination $spFldr) {
-					$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Extracted' }
-					Remove-Item $spFile -Force
-				} else {
-					$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Error: Cannot extract' }
-				}
-			} else {
+			try {
+				FtpDownload -RemoteFile $sp.SoftpaqUrl -Destination "$outDir\Softpaq" -Credentials $mycreds
+				ExtractSoftpaq -SoftpaqPath $spFile -Destination $spFldr
+				$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Extracted' }
+				Remove-Item $spFile -Force
+			} catch {
 				$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Error: Unable to download' }
-			}
-			
-			
-			
+				$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Error: Cannot extract' }
+			}			
 		}
 		
 	} #foreach
@@ -176,22 +168,25 @@ function ConnectFtp {
 }
 
 function FtpDownload {
-	Param (
-		
-		[Parameter(Mandatory = $true, Position = 0)]
+	[CmdletBinding()]
+	param
+	(
+		[Parameter(Mandatory = $true,
+				   Position = 0)]
 		[string]$RemoteFile,
-		[Parameter(Mandatory = $true, Position = 1)]
+		[Parameter(Mandatory = $true,
+				   Position = 1)]
 		[string]$Destination,
-		[Parameter(Mandatory = $true, Position = 2)]
+		[Parameter(Mandatory = $true,
+				   Position = 2)]
 		$Credentials
 	)
 	
 	$ftpServer = ($RemoteFile -split ('/'))[2]
 	$ftpPath = $RemoteFile -replace ("ftp://$ftpServer", "")
-	#write-verbose "$ftpServer $ftpPath"
 	
 	Try {
-		#Create folder to hold CVA files
+		#Create folder to hold files
 		if (!(Test-Path $Destination)) {
 			New-Item -ItemType directory -Path $Destination -ErrorAction Stop
 		}
@@ -207,9 +202,9 @@ function FtpDownload {
 		
 		
 	} Catch [System.IO.IOException] {
-		Write-Error "Unable to write file"
+		throw "Unable to write file"
 	} Catch {
-		Write-Error $_.Exception
+		throw $_.Exception
 	}
 }
 
@@ -407,7 +402,7 @@ function Create-JuntionPoints {
 	
 }
 
-function CreatePathsAndCopyFiles {
+function Create-PathsAndCopyFiles {
 	param
 	(
 		[Parameter(Mandatory = $true, Position = 1)]
@@ -418,22 +413,18 @@ function CreatePathsAndCopyFiles {
 	)
 	
 	#Create Path and copy drivers
-	#foreach ($sos in ($selectOS | ? { $_.id -eq $o.id })) {
 	foreach ($entry in ($Queue.Value | where {$_.FileStatus -eq 'Extracted' }) ) {
-		$drvPath = "$outDir\$($entry.LangName)\$($entry.OsShortName)\$($entry.ModelName)\$($entry.SoftpaqName) ( $($entry.SoftpaqVersion)))"
-		New-Item -Path $drvPath -ItemType directory -ErrorAction Continue
 		
+		$drvTitle = "$($entry.SoftpaqName) ($($entry.SoftpaqVersion))"
+		$drvPath = "$outDir\$($entry.LangName)\$($entry.OsShortName)\$($entry.ModelName)\$drvTitle)"
+		$spDir = "$outDir\softpaq\sp$($entry.SoftpaqId)"
 		
+		if (!(Test-Path $drvPath)) {
+			New-Item -Path $drvPath -ItemType directory -ErrorAction Continue
+			
+			Copy-Item -Path "$spDir\*" -Destination $drvPath -Recurse -ErrorAction Continue
+		}
 		
-		<#foreach ($m in $currentModels) {
-			$drvPath = "$outDir\$($sos.Name)\$m\$($ssp.Name)"
-			if (!(Test-Path $drvPath)) {
-				New-Item -Path $drvPath -ItemType directory -ErrorAction Continue
-				
-				Copy-Item "$spDst\*" $drvPath -Recurse -ErrorAction Continue
-				write-verbose "Copying ""$spDst"" to ""$drvPath"""
-			}
-		}#>
 	}
 }
 
