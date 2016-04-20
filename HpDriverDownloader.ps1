@@ -26,15 +26,12 @@ param
 (
 	[Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
 	[String]$cfgFile = "$PSScriptRoot\config.xml",
-
 	[Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
 	[String]$outDir = "$PSScriptRoot\Softpaqs",
-
 	[Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
-	[switch]$UseSymLinks = $false,
-
+	[switch]$UseSymLinks,
 	[Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
-	[switch]$GenerateConfig = $false
+	[switch]$Update
 )
 
 Import-Module PSFTP
@@ -48,29 +45,28 @@ $mycreds = New-Object System.Management.Automation.PSCredential ("anonymous", $s
 function main {
 	
 	# Download catalog file if not present
-	if (!(Test-Path "$outDir\ProductCatalog\modelcatalog.xml")) {
+	if ((!(Test-Path "$outDir\ProductCatalog\modelcatalog.xml")) -or $Update) {
 		DownloadCatalog -DownloadDir $outDir
-		#TEST CATALOG VERSION HERE
 	}
 	
-	if ($GenerateConfig) {
-		if (Test-Path $cfgFile) {
-			Write-Error "Config file already exists ""$cfgFile"""
-		} else {
-			BuildConfig -Catalog "$outDir\ProductCatalog\modelcatalog.xml" -OutXML $cfgFile
-			Write-Output "You must enable Language, Model and OS in the config file for this script to do anything.`n""$cfgFile"""
-		}
-	} else {		
-		if (!(Test-Path $cfgFile)) {
-			BuildConfig -Catalog "$outDir\ProductCatalog\modelcatalog.xml" -OutXML $cfgFile
+	# Load modelcatalog.xml into a hastable^2
+	$modelCatalog = Get-ModelCatalog -CatalogDir "$outDir\ProductCatalog"
+	
+	if (!(Test-Path $cfgFile)) {
+		Write-Verbose "No config File, creating..."
+		BuildConfig -ConfigTemplatePath "$PSScriptRoot\config.template.xml" -Catalog $modelCatalog -ConfigFilePath $cfgFile
+		Write-Output "You must enable Language, Model and OS in the config file for this script to do anything.`n""$cfgFile"""
+	} else {
+		
+		if ($Update) {
+			Write-Verbose "Updating catalog and configuration"
+			$modelCatalog = Get-ModelCatalog -CatalogDir "$outDir\ProductCatalog"
+			BuildConfig -ConfigTemplatePath "$PSScriptRoot\config.template.xml" -Catalog $modelCatalog -ConfigFilePath $cfgFile -Update
 			Write-Output "You must enable Language, Model and OS in the config file for this script to do anything.`n""$cfgFile"""
 		}
 		
 		# Load configuration
-		$config = ([xml](gc "$PSScriptRoot\config.xml")).config
-		
-		# Load modelcatalog.xml into a hastable^2
-		$modelCatalog = Get-ModelCatalog -CatalogDir "$outDir\ProductCatalog"
+		$config = ([xml](gc $cfgFile)).config
 		
 		# Process the catalog against our configuration to build a processing queue
 		$queue = (ProcessCatalog -ModelCatalog $modelCatalog -Config $config -CatalogDir "$outDir\ProductCatalog") |
@@ -85,12 +81,7 @@ function main {
 		} else {
 			Create-PathsAndCopyFiles -Queue ([ref]$queue) -OutDir $outDir
 		}
-		
-		#$queue | group 'LangId', 'SoftpaqName', 'OsId', 'ModelId' |
-		#Foreach-Object { $_.Group | Sort-Object SoftpaqVersionR | Select-Object -Last 1 }
-		#| export-csv c:\Downloads\queue.csv -Force -NoTypeInformation
 	}
-	
 } #main
 
 function DownloadandExtractSoftpaqs {
@@ -105,10 +96,10 @@ function DownloadandExtractSoftpaqs {
 	foreach ($sp in ($Queue.Value | select -Unique SoftpaqId, SoftpaqUrl, SoftpaqName)) {
 		$spFile = "$OutDir\Softpaq\sp$($sp.SoftpaqId).exe"
 		$spFldr = "$OutDir\Softpaq\sp$($sp.SoftpaqId)"
-			
+		
 		# Download the SP if not already present
 		if (Test-Path -PathType Container -Path $spFldr) {
-			$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Extracted' }		
+			$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Extracted' }
 		} elseif (Test-Path -Path $spFile) {
 			if (ExtractSoftpaq -SoftpaqPath $spFile -Destination $spFldr) {
 				$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Extracted' }
@@ -124,7 +115,7 @@ function DownloadandExtractSoftpaqs {
 			} catch {
 				$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Error: Unable to download' }
 				$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Error: Cannot extract' }
-			}			
+			}
 		}
 		
 	} #foreach
@@ -233,40 +224,93 @@ Function ExtractSoftpaq {
 	return ($ret.ExitCode)
 }
 
-<#
-	.SYNOPSIS
-		Creates a default config based on current HP ProductCatalog.xml
-#>
+
+function Escape {
+	param (
+		[string]$string
+	)
+	return [System.Security.SecurityElement]::Escape($string)
+}
+
 function BuildConfig {
+	[CmdletBinding(DefaultParameterSetName = 'New')]
 	param
 	(
-		[Parameter(Mandatory = $true, Position = 0)]
-		$Catalog,
-		[Parameter(Mandatory = $true, Position = 1)]
-		$OutXML
+		[Parameter(Mandatory = $true,
+				   Position = 0)]
+		[hashtable]$Catalog,
+		[Parameter(Mandatory = $true,
+				   Position = 1)]
+		[string]$ConfigFilePath,
+		[Parameter(Mandatory = $true,
+				   Position = 2)]
+		[string]$ConfigTemplatePath,
+		[Parameter(Position = 3)]
+		[switch]$Update
 	)
 	
-	$template = @"
-<?xml version="1.0"?>
-<config>
-	<languages>
-	$(foreach ($l in ($catalog.Language)) { "`t`t<language id=""$($l.Id)"" name=""$(Escape($l.Name))"" enabled=""false"" />`n" })
-	</languages>
-	<operatingsystems>
-	$(foreach ($o in ($catalog.OperatingSystem)) { "`t`t<os id=""$($o.Id)"" name=""$(Escape($o.Name))"" enabled=""false"" />`n" })
-	</operatingsystems>
-	<models>
-	$(foreach ($m in ($catalog.ProductLine.ProductFamily.ProductModel | where { $_ -ne $null })) {
-		"`t`t<model id=""$(Escape($m.Id))"" name=""$(Escape($m.Name))"" altname="""" enabled=""false"" />`n"
-	})
-	</models>
-	<categories>
-	$(foreach ($c in ($catalog.Softpaq.Category | select -Unique | sort)) { "`t`t<category name=""$(Escape($c))"" enabled=""false"" />`n" })
-	</categories>
-</config>
-"@
+	if ($Update) {
+		# Backup config
+		Copy-Item -Path $ConfigFilePath -Destination "$ConfigFilePath.old" -Force
+		
+		# Read currennt config
+		$curConfig = ([xml](gc "C:\Users\e139068.HOUTX\Documents\Scripts\HP\HpDriverDownloader\testconfig.xml")).config
+		
+		# Find enabled settings in the current catalog
+		$langDiff = @($curConfig.languages.language | where { $_.enabled -eq 'true' })
+		$osDiff = @($curConfig.operatingsystems.os | where { $_.enabled -eq 'true' })
+		$modDiff = @($curConfig.models.model | where { $_.enabled -eq 'true' })
+		$catDiff = @($curConfig.categories.category | where { $_.enabled -eq 'true' })
+	}
 	
-	$template | Out-File $OutXML -force
+	# Build xml for new config
+	$languages = @()
+	foreach ($entry in ($catalog.Languages.Values)) {
+		if ($langDiff.Id -contains $entry.Id) {
+			$languages += "`t`t<language id=""$($entry.Id)"" name=""$(Escape($entry.Name))"" enabled=""true"" />`n"
+		} else {
+			$languages += "`t`t<language id=""$($entry.Id)"" name=""$(Escape($entry.Name))"" enabled=""false"" />`n"
+		}
+	}
+	
+	$oses = @()
+	foreach ($entry in ($Catalog.OperatingSystems.Values)) {
+		if ($osDiff.Id -contains $entry.Id) {
+			$oses += "`t`t<os id=""$($entry.Id)"" name=""$(Escape($entry.Name))"" enabled=""true"" />`n"
+		} else {
+			$oses += "`t`t<os id=""$($entry.Id)"" name=""$(Escape($entry.Name))"" enabled=""false"" />`n"
+		}
+	}
+	
+	$models = @()
+	foreach ($entry in ($catalog.Models.Values)) {
+		if ($modDiff.Id -contains $entry.Id) {
+			$altName = $curConfig.models.model | ? { $_.id -eq $entry.Id } | select -expandproperty altname
+			$models += "`t`t<model id=""$($entry.Id)"" name=""$(Escape($entry.Name))"" altname=""$altName"" enabled=""true"" />`n"
+		} else {
+			$models += "`t`t<model id=""$($entry.Id)"" name=""$(Escape($entry.Name))"" altname="""" enabled=""false"" />`n"
+		}
+	}
+	
+	$categories = @()
+	foreach ($entry in ($modelCatalog.Softpaqs.Values.Category | select -Unique)) {
+		if ($catDiff.Name -contains $entry) {
+			$categories += "`t`t<category name=""$entry"" enabled=""true"" />`n"
+		} else {
+			$categories += "`t`t<category name=""$entry"" enabled=""false"" />`n"
+		}
+	}
+	
+	# Transform template into new config
+	$cfgData = (gc $ConfigTemplatePath)
+	$cfgData = $cfgData.replace('<!languages!>', $languages)
+	$cfgData = $cfgData.replace('<!operatingsystems!>', $oses)
+	$cfgData = $cfgData.replace('<!models!>', $models)
+	$cfgData = $cfgData.replace('<!categories!>', $categories)
+	$cfgData = $cfgData.replace('<!catver!>', $catalog.CatalogVersion)
+	
+	# Write new config file
+	$cfgData | Out-File $ConfigFilePath -Force -Encoding utf8
 }
 
 function Get-ModelCatalog {
@@ -280,6 +324,8 @@ function Get-ModelCatalog {
 	
 	$modelCatalogXml = ([xml](gc "$CatalogDir\modelcatalog.xml")).NewDataSet.ProductCatalog
 	$modelCatalog = @{ }
+	
+	$modelCatalog.Add('CatalogVersion', $modelCatalogXml.CatalogVersion)
 	
 	Write-Verbose "Processing Softpaqs in ModelCatlog.xml"
 	$modelCatalog.Add('Softpaqs', (New-XmlNodeHash -XmlNode ($modelCatalogXml.Softpaq) -Key 'Id'))
@@ -304,7 +350,7 @@ function New-XmlNodeHash {
 		[Parameter(Mandatory = $true, Position = 2)]
 		[string]$Key
 	)
-	$outHash = @{ }
+	$outHash = [Ordered]@{ }
 	
 	foreach ($sub in $xmlNode) {
 		try {
@@ -360,7 +406,7 @@ function ProcessCatalog {
 		where { $_.S -eq '0' }
 		
 		foreach ($sp in $SPs) {
-			if ( ($cfgCat.name) -contains (($ModelCatalog.Softpaqs)[$sp.Id].Category) ) {
+			if (($cfgCat.name) -contains (($ModelCatalog.Softpaqs)[$sp.Id].Category)) {
 				$processedData += New-Object -TypeName PSObject -Property ([Ordered]@{
 					'LangId' = $sp.ParentNode.Id;
 					'LangName' = (($ModelCatalog.Languages)[$sp.ParentNode.Id]).Name
@@ -392,7 +438,6 @@ function Create-JuntionPoints {
 	(
 		[Parameter(Mandatory = $true, Position = 1)]
 		[ref]$Queue,
-	
 		[Parameter(Mandatory = $true, Position = 2)]
 		[string]$OutDir
 	)
@@ -406,7 +451,7 @@ function Create-JuntionPoints {
 			New-Item -Path $symDir -ItemType directory -ErrorAction Continue | Out-Null
 		}
 		
-		if (!(Test-Path "$symDir\$drvTitle" )) {
+		if (!(Test-Path "$symDir\$drvTitle")) {
 			New-SymLink -Path $spDir -SymName "$symDir\$drvTitle" -Directory | Out-Null
 		}
 		
@@ -419,13 +464,12 @@ function Create-PathsAndCopyFiles {
 	(
 		[Parameter(Mandatory = $true, Position = 1)]
 		[ref]$Queue,
-	
 		[Parameter(Mandatory = $true, Position = 2)]
 		[string]$OutDir
 	)
 	
 	#Create Path and copy drivers
-	foreach ($entry in ($Queue.Value | where {$_.FileStatus -eq 'Extracted' }) ) {
+	foreach ($entry in ($Queue.Value | where { $_.FileStatus -eq 'Extracted' })) {
 		
 		$drvTitle = "$($entry.SoftpaqName) ($($entry.SoftpaqVersion))"
 		$drvPath = "$outDir\$($entry.LangName)\$($entry.OsShortName)\$($entry.ModelName)\$drvTitle)"

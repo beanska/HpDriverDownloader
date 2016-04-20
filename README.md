@@ -1,4 +1,6 @@
-#  HPDriverDownloader
+#  HPDriverDownloader 0.1
+
+
 
 Downloads HP Softpaqs and extracts them by OS / Model. Created as an alternative to the HP's Softpaq manager to organize softpaqs in a way that is easier to import in MDT/SCCM. 
 
