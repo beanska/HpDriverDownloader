@@ -1,4 +1,5 @@
-﻿#requires -Version 5.0
+﻿#Requires -Version 5.0 -RunAsAdministrator
+
 <#
 	.SYNOPSIS
 		Downloads Softpaqs from HP Inc for each operating system and model specified.
@@ -10,13 +11,24 @@
 		+Requries PSFTP module (https://gallery.technet.microsoft.com/scriptcenter/PowerShell-FTP-Client-db6fe0cb)
 	
 	.PARAMETER cfgFile
-		XML configuration file
+		Specify a configuration file. (Defaults to script folder)
 	
 	.PARAMETER outDir
-		Folder to place the downloaded softpaqs. There will be duplicates. DeDupe strongly encouraged.
-	
+		Specify a directory to store Softpaqs. (Defaults to script folder)
+
+	.PARAMETER Update
+		Downloads catalog and updates config file. Generates config file if one is not present.
+
+	.PARAMETER UseSymLinks
+		Uses symbolic links for each OS/Model combination instead of creating duplicates. If not enabling this make sure you have a large drive or deduplication enabled.
+
+	.EXAMPLE 
+		Initial Usage - You must run this to generate the config file.
+		Don't forget to edit config file after running this
+				PS C:\> HPDriverDownloader.ps1 -OutDir D:\Drivers -Update
 	.EXAMPLE
-				PS C:\> HpDriverDownloader.ps1 -cfgFile 'Value1' -outDir 'Value2'
+		Downloads softpaq file to 'D:\Drivers'. Creates symlinks instead of copying files for each model.
+				PS C:\> HPDriverDownloader.ps1 -OutDir D:\Drivers -UseSymLink
 	
 	.NOTES
 		Additional information about the file.
@@ -24,12 +36,15 @@
 [CmdletBinding()]
 param
 (
-	[Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
-	[String]$cfgFile = "$PSScriptRoot\config.xml",
-	[Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
-	[String]$outDir = "$PSScriptRoot\Softpaqs",
-	[Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
-	[switch]$UseSymLinks,
+	[Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, Mandatory = $false)]
+	[String]$cfgFile,
+
+	#[Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
+	#[String]$outDir,
+
+	#[Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
+	#[switch]$UseSymLinks,
+
 	[Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
 	[switch]$Update
 )
@@ -42,45 +57,83 @@ $procModelFile = "$PSScriptRoot\ProcessedModels.txt"
 $secpasswd = ConvertTo-SecureString "password" -AsPlainText -Force
 $mycreds = New-Object System.Management.Automation.PSCredential ("anonymous", $secpasswd)
 
+#Set Globals
+if ($Script:cfgFile -eq ""){$Script:cfgFile = "$PSScriptRoot\config.xml"}
+
+
 function main {
+	cls
 	
-	# Download catalog file if not present
-	if ((!(Test-Path "$outDir\ProductCatalog\modelcatalog.xml")) -or $Update) {
-		DownloadCatalog -DownloadDir $outDir
-	}
-	
-	# Load modelcatalog.xml into a hastable^2
-	$modelCatalog = Get-ModelCatalog -CatalogDir "$outDir\ProductCatalog"
-	
-	if (!(Test-Path $cfgFile)) {
-		Write-Verbose "No config File, creating..."
-		BuildConfig -ConfigTemplatePath "$PSScriptRoot\config.template.xml" -Catalog $modelCatalog -ConfigFilePath $cfgFile
-		Write-Output "You must enable Language, Model and OS in the config file for this script to do anything.`n""$cfgFile"""
-	} else {
-		
-		if ($Update) {
-			Write-Verbose "Updating catalog and configuration"
+	if ($Update) {
+		if ((!(Test-Path "$outDir\ProductCatalog\modelcatalog.xml"))) {
+			Write-Verbose "No catalog found Downloading and extracting."
+			DownloadCatalog -DownloadDir "$outDir"
 			$modelCatalog = Get-ModelCatalog -CatalogDir "$outDir\ProductCatalog"
-			BuildConfig -ConfigTemplatePath "$PSScriptRoot\config.template.xml" -Catalog $modelCatalog -ConfigFilePath $cfgFile -Update
-			Write-Output "You must enable Language, Model and OS in the config file for this script to do anything.`n""$cfgFile"""
-		}
-		
-		# Load configuration
-		$config = ([xml](gc $cfgFile)).config
-		
-		# Process the catalog against our configuration to build a processing queue
-		$queue = (ProcessCatalog -ModelCatalog $modelCatalog -Config $config -CatalogDir "$outDir\ProductCatalog") |
-		group 'LangId', 'SoftpaqName', 'OsId', 'ModelId' |
-		Foreach-Object { $_.Group | Sort-Object SoftpaqVersionR | Select-Object -Last 1 }
-		
-		# Download the requisite Softpaqs
-		DownloadandExtractSoftpaqs -Queue ([ref]$queue) -OutDir $outDir
-		
-		if ($UseSymLinks) {
-			Create-JuntionPoints -Queue ([ref]$queue) -OutDir $outDir
+			BuildConfig -ConfigTemplatePath "$PSScriptRoot\config.template.xml" -Catalog $modelCatalog -ConfigFilePath $cfgFile
 		} else {
-			Create-PathsAndCopyFiles -Queue ([ref]$queue) -OutDir $outDir
+			Write-Verbose "Checking for new catalog from HP."
+			DownloadCatalog -DownloadDir "$outDir\temp"
+			$newModelCatalog = Get-ModelCatalog -CatalogDir "$outDir\temp\ProductCatalog"
+			$modelCatalog = Get-ModelCatalog -CatalogDir "$outDir\ProductCatalog"
+			Write-Verbose "Found new catalog version $($newModelCatalog.CatalogVersion). ($($newModelCatalog.CatalogVersion)>$($modelCatalog.CatalogVersion))"
+			if ( ([version]($newModelCatalog.CatalogVersion)) -gt ([version]($modelCatalog.CatalogVersion)) ) {
+				Write-Verbose "Found new catalog version $($newModelCatalog.CatalogVersion). ($($newModelCatalog.CatalogVersion)>$($modelCatalog.CatalogVersion))"
+				Try {
+					Remove-Item Remove-Item -Recurse -Force "$outDir\ProductCatalog"
+					Copy-Item "$outDir\temp\ProductCatalog" "$outDir\ProductCatalog" -Recurse
+					$modelCatalog = $newModelCatalog
+				} Catch {
+					Throw $Error.Exception
+				}
+				BuildConfig -ConfigTemplatePath "$PSScriptRoot\config.template.xml" -Catalog $modelCatalog -ConfigFilePath $cfgFile -Update
+				
+			}
 		}
+		Write-Output "You must enable Language, Model, Category and OS in the config file for this script to do anything.`n""$cfgFile"""
+	} else {
+		<#
+		if (!(Test-Path $Script:cfgFile)) {
+			Throw "ERROR: ""$Script:cfgFile"" not found. Use -Update switch to generate"
+		} elseif (!(Test-Path "$outDir\ProductCatalog\modelcatalog.xml")) {
+			Throw "ERROR: ""$outDir\ProductCatalog\modelcatalog.xml"" not found. Use -Update switch to generate"
+		} else {
+		#>
+			
+			Write-Output "Loading configuration..."
+			$config = ([xml](gc $cfgFile)).config
+			
+			if ($config.OutDir.length -gt 0){
+				$Script:outDir = $config.OutDir
+			} else {
+				$Script:outDir = "$PSScriptRoot\Softpaqs"
+			}
+			
+			if ($config.OutputStructure.length -gt 0){
+				$Script:outStruct = $config.OutputStructure
+			} else {
+				#Output hardlinks by default
+				$Script:outStruct = '3'
+			}
+			
+			Write-Output "Loading catalog..."
+			$modelCatalog = Get-ModelCatalog -CatalogDir "$outDir\ProductCatalog"
+			
+			Write-Output "Process the catalog against our configuration to build a processing queue..."
+			$queue = (ProcessCatalog -ModelCatalog $modelCatalog -Config $config -CatalogDir "$outDir\ProductCatalog") |
+			group 'LangId', 'SoftpaqName', 'OsId', 'ModelId' |
+			Foreach-Object { $_.Group | Sort-Object SoftpaqVersionR | Select-Object -Last 1 }
+			
+			Write-Output "Download the requisite Softpaqs..."
+			DownloadandExtractSoftpaqs -Queue ([ref]$queue) -OutDir $outDir
+			
+			Write-Output "Building driver structure..."
+			Switch ($Script:ourStruct){
+				1 { Create-PathsAndCopyFiles -Queue ([ref]$queue) -OutDir $outDir }
+				2 { Create-DriverStructure -Queue ([ref]$queue) -OutDir $outDir }
+				3 { Create-DriverStructure -Queue ([ref]$queue) -OutDir $outDir }
+				default { Create-DriverStructure -Queue ([ref]$queue) -OutDir $outDir }
+			}
+		#}
 	}
 } #main
 
@@ -89,6 +142,7 @@ function DownloadandExtractSoftpaqs {
 	(
 		[Parameter(Mandatory = $true, Position = 1)]
 		[ref]$Queue,
+		
 		[Parameter(Mandatory = $true, Position = 2)]
 		[string]$OutDir
 	)
@@ -145,7 +199,7 @@ function String2Version {
 	param (
 		[string]$String
 	)
-	
+	Write-Verbose "VERSION |$String|"
 	$stringAry = $String.split('.')
 	$revAry = ($stringAry[3]).Split(' ')
 	$revStr = "$($revAry[0])".PadLeft(6, '0') + "$([int][char]("$($revAry[1])"))".PadLeft(2, '0') + "$($revAry[2])"
@@ -205,9 +259,9 @@ function FtpDownload {
 		
 		
 	} Catch [System.IO.IOException] {
-		throw "Unable to write file"
+		 "Unable to write file"
 	} Catch {
-		throw $_.Exception
+		$_.Exception
 	}
 }
 
@@ -384,8 +438,10 @@ function ProcessCatalog {
 	(
 		[Parameter(Mandatory = $true)]
 		[System.Xml.XmlElement]$Config,
+		
 		[Parameter(Mandatory = $true)]
 		[hashtable]$ModelCatalog,
+		
 		[Parameter(Mandatory = $true)]
 		[String]$CatalogDir
 	)
@@ -418,11 +474,13 @@ function ProcessCatalog {
 					'SoftpaqUrl' = ($ModelCatalog.Softpaqs)[$sp.Id].Url
 					'SoftpaqCategory' = ($ModelCatalog.Softpaqs)[$sp.Id].Category
 					'SoftpaqVersion' = ($ModelCatalog.Softpaqs)[$sp.Id].Version
-					'SoftpaqVersionR' = String2Version(($ModelCatalog.Softpaqs)[$sp.Id].Version)
+					#'SoftpaqVersionR' = String2Version(($ModelCatalog.Softpaqs)[$sp.Id].Version)
+					'SoftpaqVersionR' = ($ModelCatalog.Softpaqs)[$sp.Id].Version.split('.').split(' ')
 					'SoftpaqDir' = ''
 					'ModelId' = $sp.ParentNode.ParentNode.ParentNode.Id
 					'ModelName' = ($ModelCatalog.Models)[$sp.ParentNode.ParentNode.ParentNode.Id].Name
-					'ModelCustomName' = ($ModelCatalog.Models)[$sp.ParentNode.ParentNode.ParentNode.Id].altname
+					#'ModelCustomName' = ($ModelCatalog.Models)[$sp.ParentNode.ParentNode.ParentNode.Id].altname
+					'ModelCustomName' = ($Config.models.model | ? {$_.name -eq (($ModelCatalog.Models)[$sp.ParentNode.ParentNode.ParentNode.Id].Name)} | select -expandproperty altname)
 					'FileStatus' = ''
 					'Status' = ''
 				});
@@ -431,6 +489,69 @@ function ProcessCatalog {
 	}
 	
 	$processedData
+}
+
+function Create-Hardlinks {
+	param (
+		[string] $outDir,
+		[string] $spDir
+	)
+	
+
+	
+	$tree = (gci $spDir -Recurse)
+		
+	#Create folder Structure
+	foreach ($item in ($tree | where { $_.PSIsContainer -eq $true })){
+			$relDir = $item.FullName -ireplace ([regex]::Escape($spDir), "")
+			New-Item -ItemType Directory -Path "$outDir$relDir" -ErrorAction SilentlyContinue
+	
+	}
+	
+	#Create hardlinks
+	foreach ($item in ($tree | where { $_.PSIsContainer -eq $false })){
+		$target = $item.FullName
+		#$link = $item.FullName.Replace($spDir, $outDir)
+		$link = $item.FullName -ireplace ([regex]::Escape($spDir), "$outDir")
+		New-Hardlink -Link	$link -Target $target
+	}
+}
+
+function Create-DriverStructure {
+	param
+	(
+		[Parameter(Mandatory = $true, Position = 1)]
+		[ref]$Queue,
+		
+		[Parameter(Mandatory = $true, Position = 2)]
+		[string]$OutDir
+	)
+	
+	foreach ($entry in ($Queue.Value | where { $_.FileStatus -eq 'Extracted' })) {
+		$drvTitle = "$($entry.SoftpaqName) ($($entry.SoftpaqVersion))"
+		if ($entry.ModelCustomName.length -gt 1) {
+			$symDir = "$outDir\$($entry.LangName)\$($entry.OsShortName)\$($entry.ModelCustomName)"
+		} else {
+			$symDir = "$outDir\$($entry.LangName)\$($entry.OsShortName)\$($entry.ModelName)"
+		}
+		$spDir = "$outDir\softpaq\sp$($entry.SoftpaqId)"
+		
+		if (!(Test-Path $symDir)) {
+			New-Item -Path $symDir -ItemType directory -ErrorAction Continue | Out-Null
+		}
+		
+		#Junction points
+		<#
+		if (!(Test-Path "$symDir\$drvTitle")) {
+			New-SymLink -Path $spDir -SymName "$symDir\$drvTitle" -Directory | Out-Null
+		}
+		#>
+		
+		#New-HardLink -Link "$symDir\$drvTitle" -Target $spDir
+		Create-Hardlinks -outDir "$symDir\$drvTitle" -spDir $spDir
+		
+	}
+	
 }
 
 function Create-JuntionPoints {
@@ -444,16 +565,25 @@ function Create-JuntionPoints {
 	
 	foreach ($entry in ($Queue.Value | where { $_.FileStatus -eq 'Extracted' })) {
 		$drvTitle = "$($entry.SoftpaqName) ($($entry.SoftpaqVersion))"
-		$symDir = "$outDir\$($entry.LangName)\$($entry.OsShortName)\$($entry.ModelName)"
+		if ($entry.ModelCustomName.length -gt 1) {
+			$symDir = "$outDir\$($entry.LangName)\$($entry.OsShortName)\$($entry.ModelCustomName)"
+		} else {
+			$symDir = "$outDir\$($entry.LangName)\$($entry.OsShortName)\$($entry.ModelName)"
+		}
 		$spDir = "$outDir\softpaq\sp$($entry.SoftpaqId)"
 		
 		if (!(Test-Path $symDir)) {
 			New-Item -Path $symDir -ItemType directory -ErrorAction Continue | Out-Null
 		}
 		
+		#Junction points
+		<#
 		if (!(Test-Path "$symDir\$drvTitle")) {
 			New-SymLink -Path $spDir -SymName "$symDir\$drvTitle" -Directory | Out-Null
 		}
+		#>
+		
+		New-HardLink -Link "$symDir\$drvTitle" -Target $spDir
 		
 	}
 	
@@ -627,4 +757,107 @@ Function New-SymLink {
 		}
 	}
 }
+####################################################
+# http://zduck.com/2013/mklink-powershell-module/
+# Joshua Poehls
+####################################################
+function New-Hardlink {
+    <#
+    .SYNOPSIS
+        Creates a hard link.
+    #>
+    param (
+        [Parameter(Position=0, Mandatory=$true)]
+        [string] $Link,
+        [Parameter(Position=1, Mandatory=$true)]
+        [string] $Target,
+        [Parameter(Position=2)]
+        [switch] $Force
+    )
+
+    Try {
+		Invoke-MKLINK -Link $Link -Target $Target -HardLink -Force $Force
+	} Catch {
+		Write-Error "Unable to create link $Link"
+	}
+}
+
+function Invoke-MKLINK {
+    <#
+    .SYNOPSIS
+        Creates a symbolic link, hard link, or directory junction.
+    #>
+    [CmdletBinding(DefaultParameterSetName = "Symlink")]
+    param (
+        [Parameter(Position=0, Mandatory=$true)]
+        [string] $Link,
+        [Parameter(Position=1, Mandatory=$true)]
+        [string] $Target,
+
+        [Parameter(ParameterSetName = "Symlink")]
+        [switch] $Symlink = $true,
+        [Parameter(ParameterSetName = "HardLink")]
+        [switch] $HardLink,
+        [Parameter(ParameterSetName = "Junction")]
+        [switch] $Junction,
+        [Parameter()]
+        [bool] $Force
+    )
+    
+    # Resolve the paths incase a relative path was passed in.
+    $Link = (Force-Resolve-Path $Link)
+    $Target = (Force-Resolve-Path $Target)
+
+    # Ensure target exists.
+    if (-not(Test-Path $Target)) {
+        throw "Target does not exist.`nTarget: $Target"
+    }
+
+    # Ensure link does not exist.
+    if (Test-Path $Link) {
+        if ($Force) {
+            Remove-Item $Link -Recurse -Force
+        }
+        else {
+            throw "A file or directory already exists at the link path.`nLink: $Link"
+        }
+    }
+
+    $isDirectory = (Get-Item $Target).PSIsContainer
+    $mklinkArg = ""
+
+    if ($Symlink -and $isDirectory) {
+        $mkLinkArg = "/D"
+    }
+
+    if ($Junction) {
+        # Ensure we are linking a directory. (Junctions don't work for files.)
+        if (-not($isDirectory)) {
+            throw "The target is a file. Junctions cannot be created for files.`nTarget: $Target"
+        }
+
+        $mklinkArg = "/J"
+    }
+
+    if ($HardLink) {
+        # Ensure we are linking a file. (Hard links don't work for directories.)
+        if ($isDirectory) {
+            throw "The target is a directory. Hard links cannot be created for directories.`nTarget: $Target"
+        }
+
+        $mkLinkArg = "/H"
+    }
+
+    # Capture the MKLINK output so we can return it properly.
+    # Includes a redirect of STDERR to STDOUT so we can capture it as well.
+    $output = cmd /c mklink $mkLinkArg `"$Link`" `"$Target`" 2>&1
+
+    if ($lastExitCode -ne 0) {
+        throw "MKLINK failed. Exit code: $lastExitCode`n$output"
+    }
+    else {
+        Write-Output $output
+    }
+}
+
 main
