@@ -99,7 +99,7 @@ function main {
 		} else {
 		#>
 			
-			Write-Output "Loading configuration..."
+			Write-Output "Loading configuration from $cfgFile..."
 			$config = ([xml](gc $cfgFile)).config
 			
 			if ($config.OutDir.length -gt 0){
@@ -511,9 +511,12 @@ function Create-Hardlinks {
 	#Create hardlinks
 	foreach ($item in ($tree | where { $_.PSIsContainer -eq $false })){
 		$target = $item.FullName
-		#$link = $item.FullName.Replace($spDir, $outDir)
 		$link = $item.FullName -ireplace ([regex]::Escape($spDir), "$outDir")
-		New-Hardlink -Link	$link -Target $target
+        if (!(test-path $link)){
+		    New-Hardlink -Link $link -Target $target
+        } else {
+            write-host "Link ""$link"" already exists"
+        }
 	}
 }
 
@@ -858,6 +861,26 @@ function Invoke-MKLINK {
     else {
         Write-Output $output
     }
+}
+
+function Force-Resolve-Path {
+    <#
+    .SYNOPSIS
+        Calls Resolve-Path but works for files that don't exist.
+    .REMARKS
+        From http://devhawk.net/2010/01/21/fixing-powershells-busted-resolve-path-cmdlet/
+    #>
+    param (
+        [string] $FileName
+    )
+
+    $FileName = Resolve-Path $FileName -ErrorAction SilentlyContinue `
+                                       -ErrorVariable _frperror
+    if (-not($FileName)) {
+        $FileName = $_frperror[0].TargetObject
+    }
+
+    return $FileName
 }
 
 main
