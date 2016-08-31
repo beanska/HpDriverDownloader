@@ -449,17 +449,24 @@ function ProcessCatalog {
 	$processedData = @()
 	
 	$cfgOs = $Config.operatingsystems.os | where { $_.enabled -eq 'true' }
-	$cfgLng = $Config.languages.language | where { $_.enabled -eq 'true' }
+	#$cfgLng = $Config.languages.language | where { $_.enabled -eq 'true' }
 	$cfgCat = ($Config.categories.category | where { $_.enabled -eq 'true' })
 	$cfgModel = $Config.models.model | where { $_.enabled -eq 'true' }
-	
-	foreach ($file in (gci $catalogDir | where { $_.Name -ne 'modelcatalog.xml' } | where { $cfgModel.Id -contains $_.BaseName })) {
-		Write-Verbose "Processing catalog file $($file.Name)"
+
+
+	$files = (gci $catalogDir | where { $_.Name -ne 'modelcatalog.xml' } | where { $cfgModel.Id -contains $_.BaseName })
+
+	foreach ($file in $files) {
+		Write-host "Processing catalog file $($file.Name)"
 		
-		$sps = ((([xml](gc $file.FullName)).NewDataSet.ProductCatalog.ProductModel.OS |
-		where { $cfgOs.id -contains $_.Id }).Lang |
-		where { $cfgLng.id -contains $_.Id }).SP |
-		where { $_.S -eq '0' }
+		
+        $sps = ((([xml](gc $file.FullName)).NewDataSet.ProductCatalog.ProductModel.OS |
+		    where { $cfgOs.id -contains $_.Id }).Lang |
+		    where { $_.Id -eq '13' }).SP #| where { $_.S -eq '0' }
+        
+
+
+      # $catalogContent.NewDataSet.ProductCatalog.ProductModel.OS | Out-GridView
 		
 		foreach ($sp in $SPs) {
 			if (($cfgCat.name) -contains (($ModelCatalog.Softpaqs)[$sp.Id].Category)) {
@@ -487,8 +494,8 @@ function ProcessCatalog {
 			}
 		}
 	}
-	
-	$processedData
+	#$processedData | export-csv "$psScriptroot\procData.csv"
+	$processedData 
 }
 
 function Create-Hardlinks {
@@ -529,19 +536,33 @@ function Create-DriverStructure {
 		[Parameter(Mandatory = $true, Position = 2)]
 		[string]$OutDir
 	)
+
+     $Queue.Value  | Out-GridView
 	
 	foreach ($entry in ($Queue.Value | where { $_.FileStatus -eq 'Extracted' })) {
+        
 		$drvTitle = "$($entry.SoftpaqName) ($($entry.SoftpaqVersion))"
 		if ($entry.ModelCustomName.length -gt 1) {
-			$symDir = "$outDir\$($entry.LangName)\$($entry.OsShortName)\$($entry.ModelCustomName)"
+			#$symDir = "$outDir\$($entry.LangName)\$($entry.OsShortName)\$($entry.ModelCustomName)"
+            $symDir = "$outDir\Drivers\$($entry.OsShortName)\$($entry.ModelCustomName)"
 		} else {
-			$symDir = "$outDir\$($entry.LangName)\$($entry.OsShortName)\$($entry.ModelName)"
+			#$symDir = "$outDir\$($entry.LangName)\$($entry.OsShortName)\$($entry.ModelName)"
+            $symDir = "$outDir\Drivers\$($entry.OsShortName)\$($entry.ModelName)"
 		}
 		$spDir = "$outDir\softpaq\sp$($entry.SoftpaqId)"
 		
 		if (!(Test-Path $symDir)) {
-			New-Item -Path $symDir -ItemType directory -ErrorAction Continue | Out-Null
+            write-host "creating path ""$symDir\$drvTitle"""
+			Try {
+                #New-Item -Path $symDir -ItemType directory -ErrorAction Stop 
+                New-Item -Path "$symDir\$drvTitle" -ItemType directory -ErrorAction Stop 
+                
+            } Catch {
+                Write-error "Unable to create directory`n$_"
+            }
 		}
+
+        Create-Hardlinks -outDir "$symDir\$drvTitle" -spDir $spDir
 		
 		#Junction points
 		<#
@@ -551,7 +572,7 @@ function Create-DriverStructure {
 		#>
 		
 		#New-HardLink -Link "$symDir\$drvTitle" -Target $spDir
-		Create-Hardlinks -outDir "$symDir\$drvTitle" -spDir $spDir
+		
 		
 	}
 	
@@ -781,7 +802,8 @@ function New-Hardlink {
     Try {
 		Invoke-MKLINK -Link $Link -Target $Target -HardLink -Force $Force
 	} Catch {
-		Write-Error "Unable to create link $Link"
+        Write-Host "ERROR: Invoke-MKLINK -Link $Link -Target $Target -HardLink -Force $Force"
+		Write-Error "Unable to create link $Link`n$($_.exception)`n$_"
 	}
 }
 
@@ -856,6 +878,7 @@ function Invoke-MKLINK {
     $output = cmd /c mklink $mkLinkArg `"$Link`" `"$Target`" 2>&1
 
     if ($lastExitCode -ne 0) {
+        write-host "MKLINK ERROR: cmd /c mklink $mkLinkArg `"$Link`" `"$Target`""
         throw "MKLINK failed. Exit code: $lastExitCode`n$output"
     }
     else {
