@@ -382,6 +382,8 @@ function BuildConfig {
 	$cfgData = $cfgData.replace('<!models!>', $models)
 	$cfgData = $cfgData.replace('<!categories!>', $categories)
 	$cfgData = $cfgData.replace('<!catver!>', $catalog.CatalogVersion)
+	$cfgData = $cfgData.replace('<!outdir!>', $catalog.OutDir)
+	$cfgData = $cfgData.replace('<!outstruct!>', $catalog.OutputStructure)
 	
 	# Write new config file
 	$cfgData | Out-File $ConfigFilePath -Force -Encoding utf8
