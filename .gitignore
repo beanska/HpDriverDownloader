@@ -1,1 +1,9 @@
 config.xml
+CompareModels.ps1
+models.txt
+procData.csv
+newconfig.xml
+goodconfig.xml
+ChangeXML.ps1
+*.db
+*.onetoc2

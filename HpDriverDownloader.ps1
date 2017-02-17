@@ -339,11 +339,15 @@ function BuildConfig {
 	$models = @()
 	foreach ($entry in ($catalog.Models.Values)) {
 		if ($modDiff.Id -contains $entry.Id) {
-			$altName = $curConfig.models.model | ? { $_.id -eq $entry.Id } | select -expandproperty altname
-			$models += "`t`t<model id=""$($entry.Id)"" name=""$(Escape($entry.Name))"" altname=""$altName"" enabled=""true"" />`n"
+			#$altName = $curConfig.models.model | ? { $_.id -eq $entry.Id } | select -expandproperty altname
+			$models += "`t`t<model id=""$($entry.Id)"" name=""$(Escape($entry.Name))"" enabled=""true"" >`n"
 		} else {
-			$models += "`t`t<model id=""$($entry.Id)"" name=""$(Escape($entry.Name))"" altname="""" enabled=""false"" />`n"
+			$models += "`t`t<model id=""$($entry.Id)"" name=""$(Escape($entry.Name))"" enabled=""false"" >`n"
 		}
+			foreach ($altname in $entry.altname){
+				$models += "<altname name=""$($altName.name)"" />"
+			}
+		$models += "</model>`n"
 	}
 	
 	$categories = @()

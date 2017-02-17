@@ -1,0 +1,911 @@
+﻿<?xml version="1.0"?>
+
+	<!--
+	OutputStructure - Specifies how the softpaqs will linked to each model.
+		1 = Copy Files - Each softpaq is copied for each model/os it belongs to. 
+		2 = Symlinks - Creates a Symbolic link for each model/os.
+		3 = Hardlinks - Creates a hard link for each model/os.
+	-->
+<config 
+	CatalogVersion="1.0.4.0" 
+	OutDir="E:\Drivers" 
+	OutputStructure="3"
+	>
+	<languages>
+		<language id="1" name="Arabic -" enabled="false" />
+ 		<language id="2" name="Chinese - Simplified" enabled="false" />
+ 		<language id="4" name="Chinese - Traditional" enabled="false" />
+ 		<language id="5" name="Czech -" enabled="false" />
+ 		<language id="6" name="Danish -" enabled="false" />
+ 		<language id="7" name="Dutch -" enabled="false" />
+ 		<language id="13" name="English - International" enabled="true" />
+ 		<language id="14" name="Estonian" enabled="false" />
+ 		<language id="15" name="Finnish -" enabled="false" />
+ 		<language id="16" name="French - Canadian" enabled="false" />
+ 		<language id="17" name="French -" enabled="false" />
+ 		<language id="18" name="German -" enabled="false" />
+ 		<language id="19" name="Greek -" enabled="false" />
+ 		<language id="20" name="Hebrew -" enabled="false" />
+ 		<language id="22" name="Hungarian -" enabled="false" />
+ 		<language id="23" name="Indonesian" enabled="false" />
+ 		<language id="24" name="Italian -" enabled="false" />
+ 		<language id="25" name="Japanese -" enabled="false" />
+ 		<language id="26" name="Korean -" enabled="false" />
+ 		<language id="27" name="Latvian" enabled="false" />
+ 		<language id="28" name="Lithuanian" enabled="false" />
+ 		<language id="29" name="Norwegian -" enabled="false" />
+ 		<language id="30" name="Polish -" enabled="false" />
+ 		<language id="31" name="Portuguese - Brazilian" enabled="false" />
+ 		<language id="32" name="Portuguese -" enabled="false" />
+ 		<language id="33" name="Russian -" enabled="false" />
+ 		<language id="34" name="Spanish - Latin American" enabled="false" />
+ 		<language id="35" name="Spanish -" enabled="false" />
+ 		<language id="36" name="Swedish -" enabled="false" />
+ 		<language id="37" name="Thai -" enabled="false" />
+ 		<language id="38" name="Turkish -" enabled="false" />
+ 		<language id="72" name="Croatian" enabled="false" />
+ 		<language id="116" name="Slovak -" enabled="false" />
+ 		<language id="120" name="Slovenian -" enabled="false" />
+ 		<language id="125" name="Chinese - Hong Kong" enabled="false" />
+ 		<language id="126" name="Bulgarian" enabled="false" />
+ 		<language id="127" name="Romanian" enabled="false" />
+ 		<language id="128" name="Serbian" enabled="false" />
+
+	</languages>
+	<operatingsystems>
+		<os id="20" name="Microsoft Windows 98" enabled="false" />
+ 		<os id="61" name="Microsoft Windows 2000 Professional" enabled="false" />
+ 		<os id="181" name="Microsoft Windows 2000" enabled="false" />
+ 		<os id="230" name="Red Hat Linux 7.2" enabled="false" />
+ 		<os id="1020" name="Red Hat Linux 7.3" enabled="false" />
+ 		<os id="1025" name="Red Hat Linux 8.0" enabled="false" />
+ 		<os id="1058" name="Microsoft Windows XP Embedded" enabled="false" />
+ 		<os id="1059" name="Microsoft Windows XP Tablet PC Edition" enabled="false" />
+ 		<os id="1063" name="Red Hat Linux 9" enabled="false" />
+ 		<os id="1080" name="Red Hat Enterprise Linux 3 (x86)" enabled="false" />
+ 		<os id="1093" name="Microsoft Windows XP Professional" enabled="false" />
+ 		<os id="1098" name="Microsoft Windows XP Home Edition" enabled="false" />
+ 		<os id="1099" name="Microsoft Windows XP Media Center Edition" enabled="false" />
+ 		<os id="2001" name="Red Hat Enterprise Linux 3 (AMD64/EM64T)" enabled="false" />
+ 		<os id="2002" name="Microsoft Windows XP Professional x64 Edition" enabled="false" />
+ 		<os id="2020" name="Linux" enabled="false" />
+ 		<os id="2025" name="Red Hat Ent Linux 4 (x86)" enabled="false" />
+ 		<os id="2026" name="Red Hat Ent Linux 4 (AMD64/EM64T)" enabled="false" />
+ 		<os id="2035" name="Microsoft Windows Embedded for Point of Service" enabled="false" />
+ 		<os id="2036" name="HP Blade Workstation Client Embedded OS" enabled="false" />
+ 		<os id="2064" name="FreeDOS" enabled="false" />
+ 		<os id="2094" name="Microsoft Windows Vista Home Basic 32 Edition" enabled="false" />
+ 		<os id="2095" name="Microsoft Windows Vista Home Premium 32 Edition" enabled="false" />
+ 		<os id="2096" name="Microsoft Windows Vista Business 32 Edition" enabled="false" />
+ 		<os id="2097" name="Microsoft Windows Vista Enterprise 32 Edition" enabled="false" />
+ 		<os id="2098" name="Microsoft Windows Vista Ultimate 32 Edition" enabled="false" />
+ 		<os id="2099" name="Microsoft Windows Vista Starter 32 Edition" enabled="false" />
+ 		<os id="2101" name="Microsoft Windows Vista Home Basic 64 Edition" enabled="false" />
+ 		<os id="2102" name="Microsoft Windows Vista Home Premium 64 Edition" enabled="false" />
+ 		<os id="2103" name="Microsoft Windows Vista Business 64 Edition" enabled="false" />
+ 		<os id="2104" name="Microsoft Windows Vista Enterprise 64 Edition" enabled="false" />
+ 		<os id="2105" name="Microsoft Windows Vista Ultimate 64 Edition" enabled="false" />
+ 		<os id="4015" name="Red Hat Enterprise Linux 5 Desktop (x86)" enabled="false" />
+ 		<os id="4016" name="Red Hat Enterprise Linux 5 Desktop (x86_64)" enabled="false" />
+ 		<os id="4030" name="HP ThinPro" enabled="false" />
+ 		<os id="4044" name="Microsoft Windows Embedded Standard" enabled="false" />
+ 		<os id="4045" name="SUSE Linux Enterprise Desktop 11 (x86_64)" enabled="false" />
+ 		<os id="4046" name="SUSE Linux Enterprise Desktop 11 (x86)" enabled="false" />
+ 		<os id="4047" name="Microsoft Windows Embedded POSReady" enabled="false" />
+ 		<os id="4051" name="Microsoft Windows 7 Home Basic 32 Edition" enabled="false" />
+ 		<os id="4052" name="Microsoft Windows 7 Home Premium 32 Edition" enabled="false" />
+ 		<os id="4053" name="Microsoft Windows 7 Professional 32 Edition" enabled="false" />
+ 		<os id="4054" name="Microsoft Windows 7 Enterprise 32 Edition" enabled="false" />
+ 		<os id="4055" name="Microsoft Windows 7 Ultimate 32 Edition" enabled="false" />
+ 		<os id="4056" name="Microsoft Windows 7 Starter 32 Edition" enabled="false" />
+ 		<os id="4057" name="Microsoft Windows 7 Home Basic 64 Edition" enabled="false" />
+ 		<os id="4058" name="Microsoft Windows 7 Home Premium 64 Edition" enabled="false" />
+ 		<os id="4059" name="Microsoft Windows 7 Professional 64 Edition" enabled="false" />
+ 		<os id="4060" name="Microsoft Windows 7 Enterprise 64 Edition" enabled="true" />
+ 		<os id="4061" name="Microsoft Windows 7 Ultimate 64 Edition" enabled="false" />
+ 		<os id="4062" name="Microsoft Windows 7 32-bit" enabled="false" />
+ 		<os id="4063" name="Microsoft Windows 7 64-bit" enabled="false" />
+ 		<os id="4089" name="Microsoft Windows Embedded Standard 7E 32-Bit" enabled="false" />
+ 		<os id="4105" name="Red Hat Enterprise Linux 6 Workstation (x86_64)" enabled="false" />
+ 		<os id="4106" name="Red Hat Enterprise Linux 6 Workstation (x86)" enabled="false" />
+ 		<os id="4107" name="Microsoft Windows MultiPoint Server 2011" enabled="false" />
+ 		<os id="4116" name="HP Smart Client" enabled="false" />
+ 		<os id="4123" name="HP FreeLNX" enabled="false" />
+ 		<os id="4126" name="Microsoft Windows Embedded POSReady 7 32-Bit" enabled="false" />
+ 		<os id="4127" name="Microsoft Windows Embedded POSReady 7 64-Bit" enabled="false" />
+ 		<os id="4130" name="Microsoft Windows Embedded Standard 7P 32-Bit" enabled="false" />
+ 		<os id="4131" name="Microsoft Windows 8 32 Edition" enabled="false" />
+ 		<os id="4132" name="Microsoft Windows 8 64 Edition" enabled="true" />
+ 		<os id="4145" name="Ubuntu Linux" enabled="false" />
+ 		<os id="4149" name="Microsoft Windows Embedded Standard 7 32" enabled="false" />
+ 		<os id="4150" name="Microsoft Windows Embedded Standard 7 64" enabled="false" />
+ 		<os id="4152" name="Microsoft Windows Embedded Standard 7P 64-Bit" enabled="false" />
+ 		<os id="4153" name="Google Android Kit Kat" enabled="false" />
+ 		<os id="4154" name="Microsoft Windows Embedded Standard 8 64-Bit" enabled="false" />
+ 		<os id="4157" name="Microsoft Windows 8.1 32 Bit" enabled="false" />
+ 		<os id="4158" name="Microsoft Windows 8.1 64 Bit" enabled="true" />
+ 		<os id="4169" name="Win 8.1 Embedded Industry 32" enabled="false" />
+ 		<os id="4170" name="Win 8.1 Embedded Industry 64" enabled="false" />
+ 		<os id="4185" name="Red Hat Enterprise Linux 7 Workstation (x86_64)" enabled="false" />
+ 		<os id="4186" name="Ubuntu 14.04 LTS (x86-64)" enabled="false" />
+ 		<os id="4191" name="Microsoft Windows 10 32-Bit" enabled="false" />
+ 		<os id="4192" name="Microsoft Windows 10 64-Bit" enabled="true" />
+ 		<os id="4195" name="Microsoft Windows 10 IOT Industry 64-Bit (x86)" enabled="false" />
+ 		<os id="4206" name="SUSE Linux Enterprise Desktop 12 (x86_64)" enabled="false" />
+	
+	</operatingsystems>
+	<models>
+		<model id="376812" name="HP Compaq tc1100 Tablet PC" altname="" enabled="false" />
+ 		<model id="457949" name="HP Compaq tc4200 Tablet PC" altname="" enabled="false" />
+ 		<model id="1849071" name="HP Compaq tc4400 Tablet PC" altname="" enabled="false" />
+ 		<model id="332800" name="HP Compaq nx7000 Notebook PC" altname="" enabled="false" />
+ 		<model id="395656" name="HP Compaq nx5000 Notebook PC" altname="" enabled="false" />
+ 		<model id="395742" name="HP Compaq nx9100 Notebook PC" altname="" enabled="false" />
+ 		<model id="405822" name="HP Compaq nx9105 Notebook PC" altname="" enabled="false" />
+ 		<model id="472193" name="HP Compaq nx9500 Notebook PC" altname="" enabled="false" />
+ 		<model id="435095" name="HP Compaq nx4800 Notebook PC" altname="" enabled="false" />
+ 		<model id="500884" name="HP Compaq nx4820 Notebook PC" altname="" enabled="false" />
+ 		<model id="442910" name="HP Compaq nx7100 Notebook PC" altname="" enabled="false" />
+ 		<model id="445352" name="HP Compaq nx9600 Notebook PC" altname="" enabled="false" />
+ 		<model id="447337" name="HP Compaq nx8220 Notebook PC" altname="" enabled="false" />
+ 		<model id="447352" name="HP Compaq nc8230 Notebook PC" altname="" enabled="false" />
+ 		<model id="447355" name="HP Compaq nc4200 Notebook PC" altname="" enabled="false" />
+ 		<model id="447345" name="HP Compaq nc6110 Notebook PC" altname="" enabled="false" />
+ 		<model id="447347" name="HP Compaq nc6120 Notebook PC" altname="" enabled="false" />
+ 		<model id="449878" name="HP Compaq nx6110 Notebook PC" altname="" enabled="false" />
+ 		<model id="457952" name="HP Compaq nx6120 Notebook PC" altname="" enabled="false" />
+ 		<model id="471755" name="HP Compaq nx6115 Notebook PC" altname="" enabled="false" />
+ 		<model id="471756" name="HP Compaq nx6125 Notebook PC" altname="" enabled="false" />
+ 		<model id="500865" name="HP Compaq nx6130 Notebook PC" altname="" enabled="false" />
+ 		<model id="1809461" name="HP Compaq nc6140 Notebook PC" altname="" enabled="false" />
+ 		<model id="1844951" name="HP Compaq nx6105 Notebook PC" altname="" enabled="false" />
+ 		<model id="447348" name="HP Compaq nc6220 Notebook PC" altname="" enabled="false" />
+ 		<model id="447372" name="HP Compaq nc6230 Notebook PC" altname="" enabled="false" />
+ 		<model id="462858" name="HP Compaq nw8240 Mobile Workstation" altname="" enabled="false" />
+ 		<model id="1118804" name="HP Compaq nx7200 Notebook PC" altname="" enabled="false" />
+ 		<model id="1155076" name="HP Compaq nx7220 Notebook PC" altname="" enabled="false" />
+ 		<model id="1127945" name="HP Compaq nx4300 Notebook PC" altname="" enabled="false" />
+ 		<model id="1839154" name="HP Compaq nc6320 Notebook PC" altname="" enabled="false" />
+ 		<model id="1839164" name="HP Compaq nx6310 Notebook PC" altname="" enabled="false" />
+ 		<model id="1839169" name="HP Compaq nx6320 Notebook PC" altname="" enabled="false" />
+ 		<model id="3217956" name="HP Compaq nx6330 Notebook PC" altname="" enabled="false" />
+ 		<model id="1839197" name="HP Compaq nc8430 Notebook PC" altname="" enabled="false" />
+ 		<model id="1839204" name="HP Compaq nx8420 Notebook PC" altname="" enabled="false" />
+ 		<model id="1839208" name="HP Compaq nw8440 Mobile Workstation" altname="" enabled="false" />
+ 		<model id="1839212" name="HP Compaq nx9420 Notebook PC" altname="" enabled="false" />
+ 		<model id="1839862" name="HP Compaq nw9440 Mobile Workstation" altname="" enabled="false" />
+ 		<model id="1847095" name="HP Compaq nx7400 Notebook PC" altname="" enabled="false" />
+ 		<model id="1847111" name="HP Compaq nc2400 Notebook PC" altname="" enabled="false" />
+ 		<model id="1847704" name="HP Compaq nc6400 Notebook PC" altname="" enabled="false" />
+ 		<model id="1847963" name="HP Compaq nc4400 Notebook PC" altname="" enabled="false" />
+ 		<model id="1849083" name="HP Compaq nx6325 Notebook PC" altname="" enabled="false" />
+ 		<model id="3200071" name="HP Compaq nx6315 Notebook PC" altname="" enabled="false" />
+ 		<model id="3310302" name="HP Compaq nx7300 Notebook PC" altname="" enabled="false" />
+ 		<model id="3355634" name="HP Compaq 2510p Notebook PC" altname="" enabled="false" />
+ 		<model id="3355651" name="HP Compaq 6515b Notebook PC" altname="" enabled="false" />
+ 		<model id="3355661" name="HP Compaq 6510b Notebook PC" altname="" enabled="false" />
+ 		<model id="3442825" name="HP Compaq 6520s Notebook PC" altname="" enabled="false" />
+ 		<model id="3687447" name="HP Compaq 6530b Notebook PC" altname="" enabled="false" />
+ 		<model id="3687647" name="HP Compaq 6530s Notebook PC" altname="" enabled="false" />
+ 		<model id="3687667" name="HP Compaq 6535b Notebook PC" altname="" enabled="false" />
+ 		<model id="3687671" name="HP Compaq 6535s Notebook PC" altname="" enabled="false" />
+ 		<model id="3785906" name="HP Compaq 6531s Notebook PC" altname="" enabled="false" />
+ 		<model id="3355680" name="HP Compaq 8510p Notebook PC" altname="" enabled="false" />
+ 		<model id="3355681" name="HP Compaq 8510w Mobile Workstation" altname="" enabled="false" />
+ 		<model id="3355645" name="HP Compaq 2710p Notebook PC" altname="" enabled="false" />
+ 		<model id="3356621" name="HP Compaq 6710s Notebook PC" altname="" enabled="false" />
+ 		<model id="3356622" name="HP Compaq 6710b Notebook PC" altname="" enabled="false" />
+ 		<model id="3356623" name="HP Compaq 6715s Notebook PC" altname="" enabled="false" />
+ 		<model id="3356624" name="HP Compaq 6715b Notebook PC" altname="" enabled="false" />
+ 		<model id="3442833" name="HP Compaq 6720s Notebook PC" altname="" enabled="false" />
+ 		<model id="3687622" name="HP Compaq 6735s Notebook PC" altname="" enabled="false" />
+ 		<model id="3687780" name="HP Compaq 6730b Notebook PC" altname="" enabled="false" />
+ 		<model id="3687786" name="HP Compaq 6730s Notebook PC" altname="" enabled="false" />
+ 		<model id="3687795" name="HP Compaq 6735b Notebook PC" altname="" enabled="false" />
+ 		<model id="3357378" name="HP Compaq 6910p Notebook PC" altname="" enabled="false" />
+ 		<model id="3355687" name="HP Compaq 8710p Notebook PC" altname="" enabled="false" />
+ 		<model id="3355689" name="HP Compaq 8710w Mobile Workstation" altname="" enabled="false" />
+ 		<model id="3442857" name="HP Compaq 6820s Notebook PC" altname="" enabled="false" />
+ 		<model id="3688717" name="HP Compaq 6830s Notebook PC" altname="" enabled="false" />
+ 		<model id="3463692" name="HP Compaq 2210b Notebook PC" altname="" enabled="false" />
+ 		<model id="3764978" name="HP Compaq 2230s Notebook PC" altname="" enabled="false" />
+ 		<model id="7839829" name="HP mt245 Mobile Thin Client" altname="" enabled="false" />
+ 		<model id="3264344" name="HP 500 Notebook PC" altname="" enabled="false" />
+ 		<model id="3316193" name="HP 510 Notebook PC" altname="" enabled="false" />
+ 		<model id="3375954" name="HP 520 Notebook PC" altname="" enabled="false" />
+ 		<model id="3375995" name="HP 530 Notebook PC" altname="" enabled="false" />
+ 		<model id="3765001" name="HP 540 Notebook PC" altname="" enabled="false" />
+ 		<model id="3765010" name="HP 550 Notebook PC" altname="" enabled="false" />
+ 		<model id="3834264" name="HP 541 Notebook PC" altname="" enabled="false" />
+ 		<model id="4158498" name="HP 420 Notebook PC" altname="" enabled="false" />
+ 		<model id="4173269" name="HP 425 Notebook PC" altname="" enabled="false" />
+ 		<model id="4349275" name="HP 421 Notebook PC" altname="" enabled="false" />
+ 		<model id="5086734" name="HP 430 Notebook PC" altname="" enabled="false" />
+ 		<model id="5086746" name="HP 431 Notebook PC" altname="" enabled="false" />
+ 		<model id="5086773" name="HP 435 Notebook PC" altname="" enabled="false" />
+ 		<model id="5225001" name="HP 450 Notebook PC" altname="" enabled="false" />
+ 		<model id="5225007" name="HP 455 Notebook PC" altname="" enabled="false" />
+ 		<model id="4158501" name="HP 620 Notebook PC" altname="" enabled="false" />
+ 		<model id="4173278" name="HP 625 Notebook PC" altname="" enabled="false" />
+ 		<model id="5086720" name="HP 635 Notebook PC" altname="" enabled="false" />
+ 		<model id="5086783" name="HP 630 Notebook PC" altname="" enabled="false" />
+ 		<model id="5086801" name="HP 631 Notebook PC" altname="" enabled="false" />
+ 		<model id="5225013" name="HP 650 Notebook PC" altname="" enabled="false" />
+ 		<model id="5225019" name="HP 655 Notebook PC" altname="" enabled="false" />
+ 		<model id="5093699" name="HP 3105m Notebook PC" altname="" enabled="false" />
+ 		<model id="5171137" name="HP 3115m Notebook PC" altname="" enabled="false" />
+ 		<model id="5319020" name="HP 3125 Notebook PC" altname="" enabled="false" />
+ 		<model id="5379621" name="HP 242 G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="5379628" name="HP 245 G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="5405439" name="HP 242 G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="6431919" name="HP 240 G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="6431926" name="HP 245 G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="6532383" name="HP 246 G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="6536189" name="HP 248 G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="6709390" name="HP 245 G3 Notebook PC" altname="" enabled="false" />
+ 		<model id="6732458" name="HP 240 G3 Notebook PC" altname="" enabled="false" />
+ 		<model id="6884971" name="HP 246 G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="7239591" name="HP 246 G3 Notebook PC" altname="" enabled="false" />
+ 		<model id="7609937" name="HP 240 G4 Notebook PC" altname="" enabled="false" />
+ 		<model id="7609945" name="HP 245 G4 Notebook PC" altname="" enabled="false" />
+ 		<model id="7743064" name="HP 241 G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="7832043" name="HP 246 G4 Notebook PC" altname="" enabled="false" />
+ 		<model id="10193150" name="HP 240 G5 Notebook PC" altname="" enabled="false" />
+ 		<model id="10193247" name="HP 245 G5 Notebook PC" altname="" enabled="false" />
+ 		<model id="5359432" name="HP 250 G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="5359437" name="HP 255 G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="6431933" name="HP 250 G2 Notebook PC" altname="HP 250 G2 Notebook PC" enabled="true" />
+ 		<model id="6431940" name="HP 255 G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="6709397" name="HP 255 G3 Notebook PC" altname="" enabled="false" />
+ 		<model id="6732466" name="HP 250 G3 Notebook PC" altname="" enabled="false" />
+ 		<model id="7239594" name="HP 256 G3 Notebook PC" altname="" enabled="false" />
+ 		<model id="7609953" name="HP 250 G4 Notebook PC" altname="" enabled="false" />
+ 		<model id="7609961" name="HP 255 G4 Notebook PC" altname="" enabled="false" />
+ 		<model id="10180322" name="HP 250 G5 Notebook PC" altname="" enabled="false" />
+ 		<model id="10193061" name="HP 255 G5 Notebook PC" altname="" enabled="false" />
+ 		<model id="6431912" name="HP 215 G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="6847656" name="HP 210 G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="6629085" name="HP 340 G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="6732482" name="HP 345 G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="6943788" name="HP 340 G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="9259720" name="HP 340 G3 Notebook PC" altname="" enabled="false" />
+ 		<model id="9259729" name="HP 346 G3 Notebook PC" altname="" enabled="false" />
+ 		<model id="9259737" name="HP 348 G3 Notebook PC" altname="" enabled="false" />
+ 		<model id="6709441" name="HP 350 G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="6732474" name="HP 355 G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="6943796" name="HP 350 G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="6709484" name="HP Classmate Notebook PC" altname="" enabled="false" />
+ 		<model id="6943759" name="HP x360 310 G1 Convertible PC" altname="" enabled="false" />
+ 		<model id="6943766" name="HP x360 330 G1 Convertible PC" altname="" enabled="false" />
+ 		<model id="7812679" name="HP x360 310 G2 Convertible PC" altname="" enabled="false" />
+ 		<model id="8741508" name="HP x2 210 Detachable PC" altname="" enabled="false" />
+ 		<model id="3688870" name="HP EliteBook 6930p Notebook PC" altname="" enabled="false" />
+ 		<model id="3781682" name="HP EliteBook 8530w Mobile Workstation" altname="" enabled="false" />
+ 		<model id="3782359" name="HP EliteBook 8530p Notebook PC" altname="HP EliteBook 8530p" enabled="true" />
+ 		<model id="4096169" name="HP EliteBook 8540p Notebook PC" altname="HP EliteBook 8540p" enabled="true" />
+ 		<model id="4097219" name="HP EliteBook 8540w Mobile Workstation" altname="" enabled="false" />
+ 		<model id="5056950" name="HP EliteBook 8560p Notebook PC" altname="HP EliteBook 8560p" enabled="true" />
+ 		<model id="5212913" name="HP EliteBook 8570p Notebook PC Bundle" altname="HP EliteBook 8570p" enabled="true" />
+ 		<model id="3782253" name="HP EliteBook 2530p Notebook PC" altname="" enabled="false" />
+ 		<model id="4138625" name="HP EliteBook 2540p Notebook PC" altname="" enabled="false" />
+ 		<model id="5071203" name="HP EliteBook 2560p Notebook PC" altname="" enabled="false" />
+ 		<model id="5257523" name="HP EliteBook 2570p Notebook PC" altname="" enabled="false" />
+ 		<model id="3784561" name="HP EliteBook 2730p Notebook PC" altname="" enabled="false" />
+ 		<model id="4145452" name="HP EliteBook 2740p Tablet PC" altname="" enabled="false" />
+ 		<model id="5071193" name="HP EliteBook 2760p Tablet PC" altname="" enabled="false" />
+ 		<model id="4095873" name="HP EliteBook 8440p Notebook PC" altname="" enabled="false" />
+ 		<model id="4097190" name="HP EliteBook 8440w Mobile Workstation" altname="" enabled="false" />
+ 		<model id="5056943" name="HP EliteBook 8460p Notebook PC" altname="" enabled="false" />
+ 		<model id="5212908" name="HP EliteBook 8470p Notebook PC" altname="HP EliteBook 8470p" enabled="true" />
+ 		<model id="5071173" name="HP EliteBook 8560w Mobile Workstation" altname="" enabled="false" />
+ 		<model id="5257504" name="HP EliteBook 8570w Mobile Workstation" altname="" enabled="false" />
+ 		<model id="3784204" name="HP EliteBook 8730w Mobile Workstation" altname="" enabled="false" />
+ 		<model id="4137878" name="HP EliteBook 8740w Mobile Workstation" altname="" enabled="false" />
+ 		<model id="5071182" name="HP EliteBook 8760w Mobile Workstation" altname="" enabled="false" />
+ 		<model id="5257513" name="HP EliteBook 8770w Mobile Workstation" altname="" enabled="false" />
+ 		<model id="5060944" name="HP EliteBook 8460w Mobile Workstation" altname="" enabled="false" />
+ 		<model id="5212918" name="HP EliteBook 8470w Mobile Workstation" altname="" enabled="false" />
+ 		<model id="5245429" name="HP EliteBook 2170p Notebook PC" altname="" enabled="false" />
+ 		<model id="5275310" name="HP EliteBook Folio 9470m Notebook PC" altname="" enabled="false" />
+ 		<model id="7089927" name="HP EliteBook Folio 9480m Notebook PC" altname="HP EliteBook Folio 9480m" enabled="true" />
+ 		<model id="9764623" name="HP EliteBook Folio G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="5405363" name="HP EliteBook 840 G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="7343203" name="HP EliteBook 840 G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="7815296" name="HP EliteBook 840 G3 Notebook PC" altname="HP EliteBook 840 G3" enabled="true" />
+ 		<model id="5405371" name="HP EliteBook 850 G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="7343212" name="HP EliteBook 850 G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="7815301" name="HP EliteBook 850 G3 Notebook PC" altname="" enabled="false" />
+ 		<model id="5405379" name="HP EliteBook 820 G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="7343198" name="HP EliteBook 820 G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="7815291" name="HP EliteBook 820 G3 Notebook PC" altname="" enabled="false" />
+ 		<model id="5405387" name="HP EliteBook Folio 1040 G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="7343090" name="HP EliteBook Folio 1020 G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="7393378" name="HP EliteBook Folio 1040 G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="7527886" name="HP EliteBook Folio 1020 G1 Special Edition Notebook PC" altname="" enabled="false" />
+ 		<model id="8654821" name="HP EliteBook 1040 G3 Notebook PC" altname="" enabled="false" />
+ 		<model id="8811589" name="HP EliteBook Folio 1020 G1 Bang &amp; Olufsen Limited Edition" altname="" enabled="false" />
+ 		<model id="6732450" name="HP EliteBook 725 G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="7262975" name="HP EliteBook 720 G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="7420603" name="HP EliteBook 720 G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="7815276" name="HP EliteBook 725 G3 Notebook PC" altname="" enabled="false" />
+ 		<model id="6732434" name="HP EliteBook 745 G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="7263329" name="HP EliteBook 740 G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="7420611" name="HP EliteBook 740 G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="7815281" name="HP EliteBook 745 G3 Notebook PC" altname="" enabled="false" />
+ 		<model id="6732442" name="HP EliteBook 755 G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="7263337" name="HP EliteBook 750 G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="7420619" name="HP EliteBook 750 G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="7815286" name="HP EliteBook 755 G3 Notebook PC" altname="" enabled="false" />
+ 		<model id="7357750" name="HP Elite x2 1011 G1 Tablet" altname="" enabled="false" />
+ 		<model id="7786620" name="HP Elite x2 1011 G1 Tablet with Power Keyboard" altname="" enabled="false" />
+ 		<model id="8741944" name="HP Elite x2 1012 G1 Tablet" altname="" enabled="true" />
+ 		<model id="9259211" name="HP Elite x2 1012 G1 Tablet with Travel Keyboard" altname="" enabled="true" />
+ 		<model id="3687085" name="HP 2133 Mini-Note PC" altname="" enabled="false" />
+ 		<model id="3872996" name="HP Mini 2140 Notebook PC" altname="" enabled="false" />
+ 		<model id="3962962" name="HP Mini 1101" altname="" enabled="false" />
+ 		<model id="4332753" name="HP Mini 1103" altname="" enabled="false" />
+ 		<model id="5160435" name="HP Mini 1104" altname="" enabled="false" />
+ 		<model id="3973866" name="HP Mini 5101" altname="" enabled="false" />
+ 		<model id="4094023" name="HP Mini 5102" altname="" enabled="false" />
+ 		<model id="4256203" name="HP Mini 5103" altname="" enabled="false" />
+ 		<model id="4097332" name="HP Mini 2102" altname="" enabled="false" />
+ 		<model id="4220327" name="HP Mini 100e Education Edition" altname="" enabled="false" />
+ 		<model id="3691094" name="HP 2533t Mobile Thin Client" altname="" enabled="false" />
+ 		<model id="3660787" name="HP Compaq 6720t Mobile Thin Client" altname="" enabled="false" />
+ 		<model id="3958616" name="HP 4410t Mobile Thin Client" altname="" enabled="false" />
+ 		<model id="4174408" name="HP 4320t Mobile Thin Client" altname="" enabled="false" />
+ 		<model id="5071225" name="HP 6360t Mobile Thin Client" altname="" enabled="false" />
+ 		<model id="5300298" name="HP mt40 Mobile Thin Client" altname="" enabled="false" />
+ 		<model id="5394648" name="HP mt41 Mobile Thin Client" altname="" enabled="false" />
+ 		<model id="7709196" name="HP ElitePad 1000 G2 Mobile Thin Client" altname="" enabled="false" />
+ 		<model id="8604901" name="HP mt42 Mobile Thin Client" altname="" enabled="false" />
+ 		<model id="3934800" name="HP ProBook 4410s Notebook PC" altname="" enabled="false" />
+ 		<model id="3935051" name="HP ProBook 4415s Notebook PC" altname="" enabled="false" />
+ 		<model id="3935056" name="HP ProBook 4416s Notebook PC" altname="" enabled="false" />
+ 		<model id="3942117" name="HP ProBook 4411s Notebook PC" altname="" enabled="false" />
+ 		<model id="4145436" name="HP ProBook 4420s Notebook PC" altname="" enabled="false" />
+ 		<model id="4160602" name="HP ProBook 4421s Notebook PC" altname="" enabled="false" />
+ 		<model id="4173732" name="HP ProBook 4425s Notebook PC" altname="" enabled="false" />
+ 		<model id="5045464" name="HP ProBook 4430s Notebook PC" altname="" enabled="false" />
+ 		<model id="5045473" name="HP ProBook 4431s Notebook PC" altname="" enabled="false" />
+ 		<model id="5098208" name="HP ProBook 4435s Notebook PC" altname="" enabled="false" />
+ 		<model id="5098217" name="HP ProBook 4436s Notebook PC" altname="" enabled="false" />
+ 		<model id="5229470" name="HP ProBook 4445s Notebook PC" altname="" enabled="false" />
+ 		<model id="5229476" name="HP ProBook 4446s Notebook PC" altname="" enabled="false" />
+ 		<model id="5229488" name="HP ProBook 4440s Notebook PC" altname="" enabled="false" />
+ 		<model id="5229494" name="HP ProBook 4441s Notebook PC" altname="" enabled="false" />
+ 		<model id="3934829" name="HP ProBook 4510s Notebook PC" altname="" enabled="false" />
+ 		<model id="3935147" name="HP ProBook 4515s Notebook PC" altname="" enabled="false" />
+ 		<model id="4145326" name="HP ProBook 4520s Notebook PC" altname="" enabled="false" />
+ 		<model id="4173724" name="HP ProBook 4525s Notebook PC" altname="" enabled="false" />
+ 		<model id="5060882" name="HP ProBook 4530s Notebook PC" altname="" enabled="false" />
+ 		<model id="5098226" name="HP ProBook 4535s Notebook PC" altname="" enabled="false" />
+ 		<model id="5229457" name="HP ProBook 4540s Notebook PC" altname="" enabled="false" />
+ 		<model id="5229464" name="HP ProBook 4545s Notebook PC" altname="" enabled="false" />
+ 		<model id="3935158" name="HP ProBook 4710s Notebook PC" altname="" enabled="false" />
+ 		<model id="4145205" name="HP ProBook 4720s Notebook PC" altname="" enabled="false" />
+ 		<model id="5060895" name="HP ProBook 4730s Notebook PC" altname="" enabled="false" />
+ 		<model id="5229500" name="HP ProBook 4740s Notebook PC" altname="" enabled="false" />
+ 		<model id="3974410" name="HP ProBook 4310s Notebook PC" altname="" enabled="false" />
+ 		<model id="3986104" name="HP ProBook 4311s Notebook PC" altname="" enabled="false" />
+ 		<model id="4145546" name="HP ProBook 4320s Notebook PC" altname="" enabled="false" />
+ 		<model id="4160604" name="HP ProBook 4321s Notebook PC" altname="" enabled="false" />
+ 		<model id="4173634" name="HP ProBook 4325s Notebook PC" altname="" enabled="false" />
+ 		<model id="4173759" name="HP ProBook 4325s Notebook PC" altname="" enabled="false" />
+ 		<model id="4173764" name="HP ProBook 4326s Notebook PC" altname="" enabled="false" />
+ 		<model id="5045446" name="HP ProBook 4330s Notebook PC" altname="" enabled="false" />
+ 		<model id="5045455" name="HP ProBook 4331s Notebook PC" altname="" enabled="false" />
+ 		<model id="5229482" name="HP ProBook 4340s Notebook PC" altname="" enabled="false" />
+ 		<model id="5230754" name="HP ProBook 4341s Notebook PC" altname="" enabled="false" />
+ 		<model id="4021357" name="HP ProBook 5310m Notebook PC" altname="" enabled="false" />
+ 		<model id="4222535" name="HP ProBook 5320m Notebook PC" altname="" enabled="false" />
+ 		<model id="5071214" name="HP ProBook 5330m Notebook PC" altname="" enabled="false" />
+ 		<model id="4021367" name="HP ProBook 6545b Notebook PC" altname="" enabled="false" />
+ 		<model id="4095095" name="HP ProBook 6540b Notebook PC" altname="" enabled="false" />
+ 		<model id="4173772" name="HP ProBook 6550b Notebook PC" altname="HP ProBook 6550b" enabled="true" />
+ 		<model id="4174173" name="HP ProBook 6555b Notebook PC" altname="" enabled="false" />
+ 		<model id="5045607" name="HP ProBook 6560b Notebook PC" altname="" enabled="false" />
+ 		<model id="5079420" name="HP ProBook 6565b Notebook PC" altname="" enabled="false" />
+ 		<model id="5212928" name="HP ProBook 6570b Notebook PC" altname="" enabled="false" />
+ 		<model id="4021377" name="HP ProBook 6445b Notebook PC" altname="" enabled="false" />
+ 		<model id="4095208" name="HP ProBook 6440b Notebook PC" altname="" enabled="false" />
+ 		<model id="4173766" name="HP ProBook 6450b Notebook PC" altname="" enabled="false" />
+ 		<model id="4174168" name="HP ProBook 6455b Notebook PC" altname="" enabled="false" />
+ 		<model id="5045596" name="HP ProBook 6460b Notebook PC" altname="" enabled="false" />
+ 		<model id="5079415" name="HP ProBook 6465b Notebook PC" altname="" enabled="false" />
+ 		<model id="5212923" name="HP ProBook 6470b Notebook PC" altname="" enabled="false" />
+ 		<model id="5212933" name="HP ProBook 6475b Notebook PC" altname="" enabled="false" />
+ 		<model id="4173567" name="HP ProBook 5220m Notebook PC" altname="" enabled="false" />
+ 		<model id="5045211" name="HP ProBook 4230s Notebook PC" altname="" enabled="false" />
+ 		<model id="5045583" name="HP ProBook 6360b Notebook PC" altname="" enabled="false" />
+ 		<model id="5350450" name="HP ProBook 470 G0 Notebook PC" altname="" enabled="false" />
+ 		<model id="5405417" name="HP ProBook 470 G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="6943844" name="HP ProBook 470 G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="7834622" name="HP ProBook 470 G3 Notebook PC" altname="" enabled="false" />
+ 		<model id="5359407" name="HP ProBook 450 G0 Notebook PC" altname="" enabled="false" />
+ 		<model id="5359417" name="HP ProBook 455 G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="5405424" name="HP ProBook 450 G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="6943828" name="HP ProBook 450 G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="6943836" name="HP ProBook 455 G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="7834556" name="HP ProBook 450 G3 Notebook PC" altname="" enabled="false" />
+ 		<model id="7834638" name="HP ProBook 455 G3 Notebook PC" altname="" enabled="false" />
+ 		<model id="5359412" name="HP ProBook 440 G0 Notebook PC" altname="" enabled="false" />
+ 		<model id="5359422" name="HP ProBook 445 G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="5405431" name="HP ProBook 440 G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="6943812" name="HP ProBook 440 G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="6943820" name="HP ProBook 445 G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="7834552" name="HP ProBook 440 G3 Notebook PC" altname="" enabled="false" />
+ 		<model id="5379212" name="HP ProBook 430 G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="6943804" name="HP ProBook 430 G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="7834548" name="HP ProBook 430 G3 Notebook PC" altname="" enabled="false" />
+ 		<model id="5405395" name="HP ProBook 640 G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="5405410" name="HP ProBook 645 G1 Notebook PC" altname="HP ProBook 645 G1" enabled="true" />
+ 		<model id="8430731" name="HP ProBook 640 G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="8430748" name="HP ProBook 645 G2 Notebook PC" altname="HP ProBook 645 G2" enabled="true" />
+ 		<model id="5405403" name="HP ProBook 650 G1 Notebook PC" altname="HP ProBook 650 G1" enabled="true" />
+ 		<model id="5409288" name="HP ProBook 655 G1 Notebook PC" altname="HP ProBook 655 G1" enabled="true" />
+ 		<model id="8430740" name="HP ProBook 650 G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="8430758" name="HP ProBook 655 G2 Notebook PC" altname="HP ProBook 655 G2" enabled="true" />
+ 		<model id="6709405" name="HP Pro x2 410 G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="7102968" name="HP Pro x2 612 G1 Tablet" altname="" enabled="false" />
+ 		<model id="7102969" name="HP Pro x2 612 G1 Tablet with Power Keyboard" altname="" enabled="false" />
+ 		<model id="7102970" name="HP Pro x2 612 G1 Tablet with Travel Keyboard" altname="" enabled="false" />
+ 		<model id="7521949" name="HP ProBook 11 EE G1 Notebook PC" altname="" enabled="false" />
+ 		<model id="9112100" name="HP ProBook 11 EE G2 Notebook PC" altname="" enabled="false" />
+ 		<model id="3957664" name="Compaq 510 Notebook PC" altname="" enabled="false" />
+ 		<model id="3957668" name="Compaq 511 Notebook PC" altname="" enabled="false" />
+ 		<model id="3957679" name="Compaq 515 Notebook PC" altname="" enabled="false" />
+ 		<model id="3957682" name="Compaq 516 Notebook PC" altname="" enabled="false" />
+ 		<model id="3958408" name="Compaq 610 Notebook PC" altname="Compaq 610" enabled="true" />
+ 		<model id="3958412" name="Compaq 615 Notebook PC" altname="" enabled="false" />
+ 		<model id="4158431" name="Compaq 620 Notebook PC" altname="" enabled="false" />
+ 		<model id="4187025" name="Compaq 621 Notebook PC" altname="" enabled="false" />
+ 		<model id="4099469" name="Compaq Mini 102" altname="" enabled="false" />
+ 		<model id="4158430" name="Compaq 320 Notebook PC" altname="" enabled="false" />
+ 		<model id="4173256" name="Compaq 325 Notebook PC" altname="" enabled="false" />
+ 		<model id="4173266" name="Compaq 326 Notebook PC" altname="" enabled="false" />
+ 		<model id="4177916" name="Compaq 321 Notebook PC" altname="" enabled="false" />
+ 		<model id="4158446" name="Compaq 420 Notebook PC" altname="" enabled="false" />
+ 		<model id="4158453" name="Compaq 421 Notebook PC" altname="" enabled="false" />
+ 		<model id="4182328" name="Compaq 421 Notebook PC" altname="" enabled="false" />
+ 		<model id="5086756" name="Compaq 435 Notebook PC" altname="" enabled="false" />
+ 		<model id="5086767" name="Compaq 436 Notebook PC" altname="" enabled="false" />
+ 		<model id="100870" name="HP xw8000 Workstation" altname="" enabled="false" />
+ 		<model id="295781" name="HP xw6000 Workstation" altname="" enabled="false" />
+ 		<model id="346792" name="HP xw3100 Workstation" altname="" enabled="false" />
+ 		<model id="314653" name="HP xw4100 Workstation" altname="" enabled="false" />
+ 		<model id="409743" name="HP xw4200 Workstation" altname="" enabled="false" />
+ 		<model id="409751" name="HP xw6200 Workstation" altname="" enabled="false" />
+ 		<model id="424561" name="HP xw8200 Workstation" altname="" enabled="false" />
+ 		<model id="459220" name="HP xw9300 Workstation" altname="" enabled="false" />
+ 		<model id="471924" name="HP xw4300 Workstation" altname="" enabled="false" />
+ 		<model id="471926" name="HP ProLiant xw25p Blade Workstation" altname="" enabled="false" />
+ 		<model id="3644284" name="HP dc73 Blade Workstation Client" altname="" enabled="false" />
+ 		<model id="1844969" name="HP xw8400 Workstation" altname="" enabled="false" />
+ 		<model id="1844975" name="HP xw6400 Workstation" altname="" enabled="false" />
+ 		<model id="3211221" name="HP xw4400 Workstation" altname="" enabled="false" />
+ 		<model id="3211287" name="HP xw9400 Workstation" altname="" enabled="false" />
+ 		<model id="3355017" name="HP ProLiant xw460c Blade Workstation" altname="" enabled="false" />
+ 		<model id="3374180" name="HP xw3400 Workstation" altname="" enabled="false" />
+ 		<model id="3429270" name="HP xw4600 Workstation" altname="" enabled="false" />
+ 		<model id="3432822" name="HP xw6600 Workstation" altname="" enabled="false" />
+ 		<model id="3432828" name="HP xw8600 Workstation" altname="" enabled="false" />
+ 		<model id="3462728" name="HP xw4550 Workstation" altname="" enabled="false" />
+ 		<model id="3718646" name="HP Z800 Workstation" altname="" enabled="false" />
+ 		<model id="5225043" name="HP Z820 Workstation" altname="" enabled="false" />
+ 		<model id="6978844" name="HP Z840 Workstation" altname="" enabled="false" />
+ 		<model id="3718664" name="HP Z600 Workstation" altname="" enabled="false" />
+ 		<model id="5225039" name="HP Z620 Workstation" altname="" enabled="false" />
+ 		<model id="6978837" name="HP Z640 Workstation" altname="" enabled="false" />
+ 		<model id="3718669" name="HP Z400 Workstation" altname="HP Z400 Workstation" enabled="true" />
+ 		<model id="5225035" name="HP Z420 Workstation" altname="HP Z420 Workstation" enabled="true" />
+ 		<model id="6978830" name="HP Z440 Workstation" altname="HP Z440 Workstation" enabled="true" />
+ 		<model id="3822250" name="HP ProLiant xw2x220c Blade Workstation" altname="" enabled="false" />
+ 		<model id="4100644" name="HP Z200 Workstation" altname="" enabled="false" />
+ 		<model id="4132644" name="HP Z200 Small Form Factor Workstation" altname="" enabled="false" />
+ 		<model id="5053192" name="HP Z210 Small Form Factor Workstation" altname="" enabled="false" />
+ 		<model id="5053201" name="HP Z210 Convertible Minitower Workstation" altname="" enabled="false" />
+ 		<model id="5260569" name="HP Z220 Small Form Factor Workstation" altname="" enabled="false" />
+ 		<model id="5260576" name="HP Z220 Convertible Minitower Workstation" altname="HP Z220 CMT Workstation" enabled="true" />
+ 		<model id="5367814" name="HP Z230 Small Form Factor Workstation" altname="" enabled="false" />
+ 		<model id="5367826" name="HP Z230 Tower Workstation" altname="HP Z230 Tower Workstation" enabled="true" />
+ 		<model id="7801882" name="HP Z228 Microtower Workstation" altname="" enabled="false" />
+ 		<model id="8354564" name="HP Z240 Tower Workstation" altname="" enabled="true" />
+ 		<model id="8354568" name="HP Z240 Small Form Factor Workstation" altname="" enabled="false" />
+ 		<model id="10148200" name="HP Z238 Microtower Workstation" altname="" enabled="false" />
+ 		<model id="5230512" name="HP Z1 Workstation" altname="" enabled="false" />
+ 		<model id="5394629" name="HP Z1 G2 Workstation" altname="" enabled="false" />
+ 		<model id="321859" name="HP Compaq d330 Microtower Desktop PC" altname="" enabled="false" />
+ 		<model id="321865" name="HP Compaq d330 Slim Tower Desktop PC" altname="" enabled="false" />
+ 		<model id="342068" name="HP Compaq d330 Desktop PC" altname="" enabled="false" />
+ 		<model id="401735" name="HP Compaq d338 Microtower Desktop PC" altname="" enabled="false" />
+ 		<model id="316729" name="HP Compaq d530 Ultra-slim Desktop PC" altname="" enabled="false" />
+ 		<model id="401810" name="HP Compaq d538 Convertible Minitower Desktop PC" altname="" enabled="false" />
+ 		<model id="401814" name="HP Compaq d538 Small Form Factor Desktop PC" altname="" enabled="false" />
+ 		<model id="321885" name="HP d325 Microtower Desktop PC" altname="" enabled="false" />
+ 		<model id="352429" name="HP d325 Slim Tower Desktop PC" altname="" enabled="false" />
+ 		<model id="337531" name="HP Compaq d220 Microtower Desktop PC" altname="" enabled="false" />
+ 		<model id="401739" name="HP Compaq d228 Microtower Desktop PC" altname="" enabled="false" />
+ 		<model id="339694" name="HP rp5000 Point of Sale" altname="" enabled="false" />
+ 		<model id="346020" name="HP Compaq d230 Microtower Desktop PC" altname="" enabled="false" />
+ 		<model id="379341" name="HP Compaq d240 Microtower Desktop PC" altname="" enabled="false" />
+ 		<model id="401743" name="HP Compaq d248 Microtower" altname="" enabled="false" />
+ 		<model id="428495" name="HP Compaq dx2000 Slim Tower PC" altname="" enabled="false" />
+ 		<model id="403747" name="HP Compaq dc5000 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="403750" name="HP Compaq dc5000 Microtower PC" altname="" enabled="false" />
+ 		<model id="402165" name="HP Compaq dc7100 Convertible Minitower PC" altname="" enabled="false" />
+ 		<model id="410114" name="HP Compaq dc7100 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="402170" name="HP Compaq dx6100 Microtower PC" altname="" enabled="false" />
+ 		<model id="410132" name="HP Compaq dx6100 Slim Tower PC" altname="" enabled="false" />
+ 		<model id="403754" name="HP bc1000 Blade PC" altname="" enabled="false" />
+ 		<model id="410368" name="HP dx6050 Microtower" altname="" enabled="false" />
+ 		<model id="443612" name="HP Compaq d260 Microtower Desktop PC" altname="" enabled="false" />
+ 		<model id="447280" name="HP Compaq dc5100 Microtower PC" altname="" enabled="false" />
+ 		<model id="447291" name="HP Compaq dc5100 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="447469" name="HP dx5150 Microtower PC" altname="" enabled="false" />
+ 		<model id="447470" name="HP dx5150 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="456581" name="HP Compaq dx6120 Microtower PC" altname="" enabled="false" />
+ 		<model id="456585" name="HP Compaq dx6120 Slim Tower PC" altname="" enabled="false" />
+ 		<model id="465734" name="HP Compaq dx6128 Microtower PC" altname="" enabled="false" />
+ 		<model id="472259" name="HP Compaq dc7600 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="472260" name="HP Compaq dc7600 Ultra-slim Desktop PC" altname="" enabled="false" />
+ 		<model id="472278" name="HP Compaq dc7600 Convertible Minitower PC" altname="" enabled="false" />
+ 		<model id="500753" name="HP Compaq dx7200 Slim Tower PC" altname="" enabled="false" />
+ 		<model id="1140670" name="HP Compaq dx7200 Microtower PC" altname="" enabled="false" />
+ 		<model id="1126584" name="HP Compaq dx2100 Slim Tower PC" altname="" enabled="false" />
+ 		<model id="1152130" name="HP Compaq dx2100 Microtower PC" altname="" enabled="false" />
+ 		<model id="1138048" name="HP Compaq dx7208 Microtower PC" altname="" enabled="false" />
+ 		<model id="1138051" name="HP Compaq dc7608 Convertible Minitower PC" altname="" enabled="false" />
+ 		<model id="1138053" name="HP Compaq dc7608 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="1155818" name="HP Compaq dx2060 Microtower PC" altname="" enabled="false" />
+ 		<model id="1155822" name="HP Compaq dx2068 Microtower PC" altname="" enabled="false" />
+ 		<model id="1155846" name="HP Compaq dx2180 Microtower PC" altname="" enabled="false" />
+ 		<model id="1155850" name="HP Compaq dx2188 Microtower PC" altname="" enabled="false" />
+ 		<model id="1812500" name="HP Compaq d290 Microtower PC" altname="" enabled="false" />
+ 		<model id="1843573" name="HP dx2030 Microtower PC" altname="" enabled="false" />
+ 		<model id="1844706" name="HP dx2038 Microtower PC" altname="" enabled="false" />
+ 		<model id="1844702" name="HP Compaq dx2200 Microtower PC" altname="" enabled="false" />
+ 		<model id="3223350" name="HP Compaq dx2280 Microtower PC" altname="" enabled="false" />
+ 		<model id="3232101" name="HP Compaq dc7700 Convertible Minitower PC" altname="" enabled="false" />
+ 		<model id="3232108" name="HP Compaq dc7700 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="3232116" name="HP Compaq dc7700 Ultra-slim Desktop PC" altname="" enabled="false" />
+ 		<model id="3249660" name="HP Compaq dc5700 Microtower PC" altname="" enabled="false" />
+ 		<model id="3249662" name="HP Compaq dc5700 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="3251397" name="HP Compaq dx7300 Microtower PC" altname="" enabled="false" />
+ 		<model id="3251400" name="HP Compaq dx7300 Slim Tower PC" altname="" enabled="false" />
+ 		<model id="3253418" name="HP Compaq dc5750 Microtower PC" altname="HP Compaq dc5750 Microtower" enabled="true" />
+ 		<model id="3253423" name="HP Compaq dc5750 Small Form Factor PC" altname="" enabled="true" />
+ 		<model id="3264559" name="HP Compaq dx2700 Microtower PC" altname="" enabled="false" />
+ 		<model id="3264565" name="HP Compaq dx2700 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="3310267" name="HP Compaq dx2250 Microtower PC" altname="" enabled="false" />
+ 		<model id="3328437" name="HP Compaq dx2255 Microtower PC" altname="" enabled="false" />
+ 		<model id="3352968" name="HP Compaq dx2300 Microtower PC" altname="" enabled="false" />
+ 		<model id="3360416" name="HP Compaq dx7380 Microtower PC" altname="" enabled="false" />
+ 		<model id="3375927" name="HP rp5700 Point of Sale System" altname="" enabled="false" />
+ 		<model id="3412873" name="HP Compaq dx2020 Microtower PC" altname="" enabled="false" />
+ 		<model id="3439592" name="HP Compaq dx2258 Microtower PC" altname="" enabled="false" />
+ 		<model id="3458408" name="HP Compaq dx2130 Microtower PC" altname="" enabled="false" />
+ 		<model id="3458435" name="HP Compaq dx2138 Microtower PC" altname="" enabled="false" />
+ 		<model id="3458404" name="HP Compaq dx2080 Microtower PC" altname="" enabled="false" />
+ 		<model id="3459243" name="HP Compaq dc7800 Convertible Minitower PC" altname="" enabled="false" />
+ 		<model id="3459245" name="HP Compaq dc7800 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="3459247" name="HP Compaq dc7800 Ultra-slim Desktop PC" altname="" enabled="false" />
+ 		<model id="3459272" name="HP Compaq dx7400 Microtower PC" altname="" enabled="false" />
+ 		<model id="3459275" name="HP Compaq dx7400 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="3460194" name="HP Compaq dx7408 Microtower PC" altname="" enabled="false" />
+ 		<model id="3658083" name="HP Compaq dc5800 Microtower PC" altname="" enabled="false" />
+ 		<model id="3658094" name="HP Compaq dc5800 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="3658100" name="HP Compaq dx2480 Microtower PC" altname="" enabled="false" />
+ 		<model id="3658107" name="HP Compaq dc5850 Microtower PC" altname="HP Compaq dc5850 Microtower" enabled="true" />
+ 		<model id="3658111" name="HP Compaq dc5850 Small Form Factor PC" altname="HP Compaq dc5850 Small Form Factor" enabled="true" />
+ 		<model id="3658360" name="HP Compaq dx2710 Microtower PC" altname="" enabled="false" />
+ 		<model id="3658361" name="HP Compaq dx2710 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="3658376" name="HP Compaq dx2400 Microtower PC" altname="" enabled="false" />
+ 		<model id="3658383" name="HP Compaq dx2450 Microtower PC" altname="" enabled="false" />
+ 		<model id="3658391" name="HP Compaq dx2390 Microtower PC" altname="" enabled="false" />
+ 		<model id="3670136" name="HP Compaq dx2355 Microtower PC" altname="" enabled="false" />
+ 		<model id="3693803" name="HP Compaq dx2310 Microtower PC" altname="" enabled="false" />
+ 		<model id="3710702" name="HP Compaq dx2009 Very Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="3693809" name="HP Compaq dx2318 Microtower PC" altname="" enabled="false" />
+ 		<model id="3887066" name="HP Compaq dx2358 Microtower PC" altname="" enabled="false" />
+ 		<model id="3296405" name="HP Compaq dx2708 Microtower PC" altname="" enabled="false" />
+ 		<model id="3785037" name="HP Compaq dc7900 Convertible Minitower PC" altname="" enabled="false" />
+ 		<model id="3785038" name="HP Compaq dc7900 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="3785039" name="HP Compaq dc7900 Ultra-slim Desktop PC" altname="" enabled="false" />
+ 		<model id="3791664" name="HP rp3000 Point of Sale System" altname="" enabled="false" />
+ 		<model id="3804428" name="HP Compaq dx7500 Microtower PC" altname="" enabled="false" />
+ 		<model id="3804436" name="HP Compaq dx7500 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="3857623" name="HP Compaq dx2810 Microtower PC" altname="" enabled="false" />
+ 		<model id="3859521" name="HP Compaq dx2810 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="3859566" name="HP Compaq dx2818 Microtower PC" altname="" enabled="false" />
+ 		<model id="3910821" name="HP Compaq dx7518 Microtower PC" altname="" enabled="false" />
+ 		<model id="3877988" name="HP Compaq dx7480aa Microtower PC" altname="" enabled="false" />
+ 		<model id="3877992" name="HP Compaq dx7480ab Microtower PC" altname="" enabled="false" />
+ 		<model id="3877995" name="HP Compaq dx7480aa Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="3877997" name="HP Compaq dx7480ab Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="3888557" name="HP Compaq dx7510 Microtower PC" altname="" enabled="false" />
+ 		<model id="3919564" name="HP Compaq dx2420 Microtower PC" altname="" enabled="false" />
+ 		<model id="3926824" name="Compaq dx1000 Microtower PC" altname="" enabled="false" />
+ 		<model id="3949208" name="HP Compaq dx2040 Microtower PC" altname="" enabled="false" />
+ 		<model id="4023815" name="HP Compaq 6000 Pro Microtower PC" altname="" enabled="false" />
+ 		<model id="4024463" name="HP Compaq 6000 Pro Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="4024557" name="HP Compaq 6005 Pro Small Form Factor PC" altname="HP Compaq 6005 Pro SFF PC" enabled="true" />
+ 		<model id="4024580" name="HP Compaq 6005 Pro Microtower PC" altname="HP Compaq 6005 Pro MT PC" enabled="true" />
+ 		<model id="4169007" name="HP Compaq 6005 Pro Ultra-slim Desktop PC" altname="" enabled="false" />
+ 		<model id="4209968" name="HP Compaq 6000 Pro All-in-One PC" altname="" enabled="false" />
+ 		<model id="4025811" name="Compaq 500B Microtower PC" altname="" enabled="false" />
+ 		<model id="4025819" name="Compaq 505B Microtower PC" altname="" enabled="false" />
+ 		<model id="4039079" name="HP TouchSmart 9100 All-in-One PC" altname="" enabled="false" />
+ 		<model id="4047715" name="HP Pro 2000 Microtower PC" altname="" enabled="false" />
+ 		<model id="4047723" name="HP Pro 2080 Microtower PC" altname="" enabled="false" />
+ 		<model id="4093102" name="HP ap5000 All-in-One Point of Sale System" altname="" enabled="false" />
+ 		<model id="4098499" name="HP Compaq 8100 Elite Convertible Minitower PC" altname="" enabled="false" />
+ 		<model id="4098511" name="HP Compaq 8100 Elite Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="4257455" name="HP rp5700 Desktop PC" altname="" enabled="false" />
+ 		<model id="4260022" name="Compaq 510B Minitower PC" altname="" enabled="false" />
+ 		<model id="4260032" name="Compaq 515B Minitower PC" altname="" enabled="false" />
+ 		<model id="5033865" name="HP Pro 4500 Microtower PC" altname="" enabled="false" />
+ 		<model id="5037431" name="HP 100B All-in-One PC" altname="" enabled="false" />
+ 		<model id="5037890" name="HP Compaq 4000 Pro Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="5037902" name="HP Compaq 6200 Pro Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="5037911" name="HP Compaq 6200 Pro Microtower PC" altname="" enabled="false" />
+ 		<model id="5037933" name="HP Compaq 8200 Elite Small Form Factor PC" altname="HP Compaq 8200 Elite SFF PC" enabled="true" />
+ 		<model id="5037942" name="HP Compaq 8200 Elite Microtower PC" altname="" enabled="false" />
+ 		<model id="5037951" name="HP Compaq 8200 Elite Convertible Minitower PC" altname="" enabled="false" />
+ 		<model id="5037960" name="HP Compaq 8200 Elite Ultra-slim PC" altname="" enabled="false" />
+ 		<model id="5078592" name="HP Compaq 8200 Elite All-in-One PC" altname="" enabled="false" />
+ 		<model id="5060846" name="HP TouchSmart 9300 Elite All-in-One PC" altname="" enabled="false" />
+ 		<model id="5064874" name="HP Omni Pro 110 Business PC" altname="" enabled="false" />
+ 		<model id="5081353" name="HP rp5800 Retail System" altname="" enabled="false" />
+ 		<model id="5096588" name="HP MultiSeat ms6200 Desktop" altname="" enabled="false" />
+ 		<model id="5099624" name="Compaq 100B Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="5154808" name="HP Pro 1005 All-in-One PC" altname="" enabled="false" />
+ 		<model id="5154824" name="HP TouchSmart Elite 7320 All-in-One PC" altname="" enabled="false" />
+ 		<model id="5154816" name="HP Pro 3420 All-in-One PC" altname="" enabled="false" />
+ 		<model id="5160138" name="HP Pro 3400 Microtower PC" altname="" enabled="false" />
+ 		<model id="5160147" name="HP Pro 3405 Microtower PC" altname="" enabled="false" />
+ 		<model id="5160155" name="HP Pro 3410 Microtower PC" altname="" enabled="false" />
+ 		<model id="5161652" name="HP Pro 3410 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="5161633" name="HP SignagePlayer mp8200" altname="" enabled="false" />
+ 		<model id="5161639" name="HP SignagePlayer mp8200s" altname="" enabled="false" />
+ 		<model id="5226817" name="HP t610 Flexible Thin Client" altname="" enabled="false" />
+ 		<model id="5226824" name="HP t610 PLUS Flexible Thin Client" altname="" enabled="false" />
+ 		<model id="5232848" name="HP Compaq Elite 8300 Convertible Minitower PC" altname="HP Compaq Elite 8300 CMT" enabled="true" />
+ 		<model id="5232855" name="HP Compaq Elite 8300 Small Form Factor PC" altname="HP Compaq Elite 8300 SFF" enabled="true" />
+ 		<model id="5232862" name="HP Compaq Elite 8300 Microtower PC" altname="" enabled="false" />
+ 		<model id="5232869" name="HP Compaq Elite 8300 Ultra-slim PC" altname="" enabled="false" />
+ 		<model id="5272029" name="HP Compaq Elite 8300 All-in-One PC" altname="" enabled="false" />
+ 		<model id="5232877" name="HP Compaq Pro 6300 Microtower PC" altname="" enabled="false" />
+ 		<model id="5232884" name="HP Compaq Pro 6300 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="5272041" name="HP Compaq Pro 6300 All-in-One PC" altname="" enabled="false" />
+ 		<model id="5296270" name="HP Compaq Pro 6305 Small Form Factor PC" altname="HP Compaq Pro 6305 SFF" enabled="true" />
+ 		<model id="5296279" name="HP Compaq Pro 6305 Microtower PC" altname="HP Compaq Pro 6305 MT" enabled="true" />
+ 		<model id="5257340" name="HP Compaq Pro 4300 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="5257347" name="HP Compaq Pro 4300 All-in-One PC" altname="" enabled="false" />
+ 		<model id="5263787" name="HP RP7 Retail System Model 7800" altname="" enabled="false" />
+ 		<model id="5300341" name="HP RP7 Retail System Model 7100" altname="" enabled="false" />
+ 		<model id="5270850" name="HP Pro 3500 Microtower PC" altname="" enabled="false" />
+ 		<model id="5270857" name="HP Pro 3505 Microtower PC" altname="" enabled="false" />
+ 		<model id="5279184" name="HP Pro 3515 Microtower PC" altname="" enabled="false" />
+ 		<model id="5299220" name="HP Pro All-in-One 3520 PC" altname="" enabled="false" />
+ 		<model id="7086945" name="HP Pro 3500 G2 Microtower PC" altname="" enabled="false" />
+ 		<model id="5270865" name="HP Elite 7500 Microtower PC" altname="" enabled="false" />
+ 		<model id="5270873" name="HP 600B Microtower PC" altname="" enabled="false" />
+ 		<model id="5296240" name="HP 1105 All-in-One Desktop PC" altname="" enabled="false" />
+ 		<model id="5300331" name="HP RP3 Retail System Model 3100" altname="" enabled="false" />
+ 		<model id="4065890" name="HP Compaq 8000 Elite Convertible Minitower PC" altname="" enabled="false" />
+ 		<model id="4065895" name="HP Compaq 8000 Elite Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="4065900" name="HP Compaq 8000 Elite Ultra-slim PC" altname="" enabled="false" />
+ 		<model id="4098653" name="HP Compaq 8000f Elite Ultra-slim PC" altname="" enabled="false" />
+ 		<model id="4047651" name="HP Pro 3000 Microtower PC" altname="" enabled="false" />
+ 		<model id="4047658" name="HP Pro 3000 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="4047666" name="HP Pro 3010 Microtower PC" altname="" enabled="false" />
+ 		<model id="4047673" name="HP Pro 3010 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="4047681" name="HP Pro 3080 Microtower PC" altname="" enabled="false" />
+ 		<model id="4047690" name="HP Pro 3005 Microtower PC" altname="" enabled="false" />
+ 		<model id="4047698" name="HP Pro 3015 Microtower PC" altname="" enabled="false" />
+ 		<model id="4047706" name="HP Pro 3085 Microtower PC" altname="" enabled="false" />
+ 		<model id="4132216" name="HP Pro 3090 Microtower PC" altname="" enabled="false" />
+ 		<model id="4025606" name="HP Elite 7000 Microtower PC" altname="" enabled="false" />
+ 		<model id="4191659" name="HP Pro 3110 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="4191666" name="HP Pro 3110 Minitower PC" altname="" enabled="false" />
+ 		<model id="4191673" name="HP Pro 3120 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="4191680" name="HP Pro 3120 Minitower PC" altname="" enabled="false" />
+ 		<model id="4191687" name="HP Pro 3130 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="4191694" name="HP Pro 3130 Minitower PC" altname="" enabled="false" />
+ 		<model id="4191699" name="HP Pro 3115 Minitower PC" altname="" enabled="false" />
+ 		<model id="4191788" name="HP Pro 3125 Minitower PC" altname="" enabled="false" />
+ 		<model id="5037420" name="HP Pro 3135 Microtower PC" altname="" enabled="false" />
+ 		<model id="5099460" name="HP Pro 3300 Microtower PC" altname="" enabled="false" />
+ 		<model id="5099469" name="HP Pro 3300 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="5099479" name="HP Pro 3305 Microtower PC" altname="" enabled="false" />
+ 		<model id="5160082" name="HP Pro 3330 Microtower PC" altname="" enabled="false" />
+ 		<model id="5160089" name="HP Pro 3330 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="5160097" name="HP Pro 3335 Microtower PC" altname="" enabled="false" />
+ 		<model id="5160105" name="HP Pro 3340 Microtower PC" altname="" enabled="false" />
+ 		<model id="4132190" name="HP Elite 7100 Microtower PC" altname="" enabled="false" />
+ 		<model id="5037410" name="HP Elite 7200 Microtower PC" altname="" enabled="false" />
+ 		<model id="5099491" name="HP Elite 7300 Microtower PC" altname="" enabled="false" />
+ 		<model id="5380555" name="HP 1155 All-in-One Desktop PC" altname="" enabled="false" />
+ 		<model id="5387440" name="HP ProDesk 600 G1 Tower PC" altname="" enabled="false" />
+ 		<model id="5387449" name="HP ProDesk 600 G1 Small Form Factor PC" altname="HP ProDesk 600 G1 SFF" enabled="true" />
+ 		<model id="5387458" name="HP ProOne 600 G1 All-in-One PC" altname="HP ProDesk 600 G1 DM" enabled="true" />
+ 		<model id="5399294" name="HP ProDesk 680 G1 Tower PC" altname="" enabled="false" />
+ 		<model id="6595199" name="HP ProDesk 600 G1 Desktop Mini PC" altname="" enabled="false" />
+ 		<model id="7633311" name="HP ProDesk 600 G2 Microtower PC" altname="" enabled="false" />
+ 		<model id="7633320" name="HP ProDesk 600 G2 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="7633349" name="HP ProOne 600 G2 21.5-inch Non-Touch All-in-One PC" altname="" enabled="false" />
+ 		<model id="8376394" name="HP ProDesk 600 G2 Desktop Mini PC" altname="" enabled="false" />
+ 		<model id="8818768" name="HP ProOne 600 G2 21.5-inch Touch All-in-One PC" altname="" enabled="false" />
+ 		<model id="5387468" name="HP EliteDesk 800 G1 Tower PC" altname="HP EliteDesk 800 G1 USDT" enabled="true" />
+ 		<model id="5387481" name="HP EliteDesk 800 G1 Base Model Small Form Factor PC" altname="HP EliteDesk 800 G1 SFF" enabled="true" />
+ 		<model id="5387490" name="HP EliteDesk 800 G1 Base Model Ultra-slim PC" altname="" enabled="false" />
+ 		<model id="5387494" name="HP EliteOne 800 G1 All-in-One PC" altname="" enabled="false" />
+ 		<model id="5399301" name="HP EliteDesk 880 G1 Tower PC" altname="" enabled="false" />
+ 		<model id="6595207" name="HP EliteDesk 800 G1 Desktop Mini PC" altname="" enabled="false" />
+ 		<model id="6893903" name="HP EliteOne 800 G1 21.5-inch Non-Touch All-in-One PC" altname="" enabled="false" />
+ 		<model id="7633267" name="HP EliteDesk 800 35W G2 Desktop Mini PC" altname="" enabled="false" />
+ 		<model id="7633278" name="HP EliteDesk 800 G2 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="7633298" name="HP EliteDesk 800 G2 Tower PC" altname="" enabled="false" />
+ 		<model id="7633340" name="HP EliteOne 800 G2 23-inch Touch All-in-One PC" altname="" enabled="false" />
+ 		<model id="8741497" name="HP EliteDesk 800 65W G2 Desktop Mini PC" altname="" enabled="false" />
+ 		<model id="8818662" name="HP EliteOne 800 G2 23-inch Non-Touch All-in-One PC" altname="" enabled="false" />
+ 		<model id="5389536" name="HP ProDesk 400 G1 Microtower PC" altname="" enabled="false" />
+ 		<model id="5389540" name="HP ProDesk 400 G1 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="5448290" name="HP ProDesk 480 G1 Microtower PC" altname="" enabled="false" />
+ 		<model id="5448297" name="HP ProDesk 490 G1 Microtower PC" altname="" enabled="false" />
+ 		<model id="5448304" name="HP ProDesk 498 G1 Microtower PC" altname="" enabled="false" />
+ 		<model id="5448311" name="HP ProDesk 405 G1 Microtower PC" altname="" enabled="false" />
+ 		<model id="5448318" name="HP ProDesk 485 G1 Microtower PC" altname="" enabled="false" />
+ 		<model id="5448325" name="HP ProOne 400 G1 19.5-inch Non-Touch All-in-One PC" altname="" enabled="false" />
+ 		<model id="6663584" name="HP ProOne 400 G1 21.5-inch Touch All-in-One PC" altname="" enabled="false" />
+ 		<model id="6893847" name="HP ProDesk 400 G2 Microtower PC" altname="" enabled="false" />
+ 		<model id="6893854" name="HP ProDesk 480 G2 Microtower PC" altname="" enabled="false" />
+ 		<model id="6893861" name="HP ProDesk 490 G2 Microtower PC" altname="" enabled="false" />
+ 		<model id="6893868" name="HP ProDesk 498 G2 Microtower PC" altname="" enabled="false" />
+ 		<model id="6950966" name="HP ProOne 400 G1 23-inch Non-Touch All-in-One PC" altname="" enabled="false" />
+ 		<model id="6950974" name="HP ProDesk 405 G2 Microtower PC" altname="" enabled="false" />
+ 		<model id="6950981" name="HP ProDesk 485 G2 Microtower PC" altname="" enabled="false" />
+ 		<model id="7451146" name="HP ProDesk 400 G2 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="7519862" name="HP ProDesk 400 G1 Desktop Mini PC" altname="" enabled="false" />
+ 		<model id="7633359" name="HP ProDesk 490 G3 Microtower PC" altname="" enabled="false" />
+ 		<model id="7638317" name="HP ProDesk 400 G2 Desktop Mini PC" altname="" enabled="false" />
+ 		<model id="7638326" name="HP ProDesk 400 G3 Microtower PC" altname="" enabled="false" />
+ 		<model id="7638335" name="HP ProDesk 480 G3 Microtower PC" altname="" enabled="false" />
+ 		<model id="7638344" name="HP ProOne 400 G2 20-inch Touch All-in-One PC" altname="" enabled="false" />
+ 		<model id="8223650" name="HP ProDesk 400 G2.5 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="8354579" name="HP ProDesk 498 G3 Microtower PC" altname="" enabled="false" />
+ 		<model id="8354587" name="HP ProDesk 400 G3 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="8818670" name="HP ProOne 400 G2 20-inch Non-Touch All-in-One PC" altname="" enabled="false" />
+ 		<model id="6532104" name="HP 200 G1 Microtower PC" altname="" enabled="false" />
+ 		<model id="6532111" name="HP 202 G1 Microtower PC" altname="" enabled="false" />
+ 		<model id="6532119" name="HP 205 G1 All-in-One PC" altname="" enabled="false" />
+ 		<model id="6761987" name="HP 202 G2 Microtower PC" altname="" enabled="false" />
+ 		<model id="7357748" name="HP 280 G1 Microtower PC" altname="" enabled="false" />
+ 		<model id="7375835" name="HP 260 G1 Desktop Mini PC" altname="" enabled="false" />
+ 		<model id="7460686" name="HP 205 G2 18.5-inch Non-Touch All-in-One PC" altname="" enabled="false" />
+ 		<model id="7690612" name="HP 285 Pro G1 Microtower PC" altname="" enabled="false" />
+ 		<model id="7739475" name="HP 280 Pro G1 Microtower PC" altname="" enabled="false" />
+ 		<model id="8741824" name="HP 280 G2 Microtower PC" altname="" enabled="false" />
+ 		<model id="8934816" name="HP 280 G1 Slim Tower PC (ENERGY STAR)" altname="" enabled="false" />
+ 		<model id="8934824" name="HP 200 G1 Slim Tower PC (ENERGY STAR)" altname="" enabled="false" />
+ 		<model id="8934830" name="HP 285 G2 Microtower PC" altname="" enabled="false" />
+ 		<model id="10135644" name="HP 280 Pro G2 Microtower PC" altname="" enabled="false" />
+ 		<model id="10135652" name="HP 285 Pro G2 Microtower PC" altname="" enabled="false" />
+ 		<model id="10273051" name="HP 286 Pro G2 Microtower PC" altname="" enabled="false" />
+ 		<model id="6950958" name="HP RP5 Retail System Model 5810" altname="" enabled="false" />
+ 		<model id="6967498" name="HP RP2 Retail System Model 2000" altname="" enabled="false" />
+ 		<model id="7101543" name="HP RP2 Retail System Model 2030" altname="" enabled="false" />
+ 		<model id="7307937" name="HP RP2 Retail System Model 2020" altname="" enabled="false" />
+ 		<model id="6888266" name="HP 402 G1 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="7107913" name="HP 18 All-in-One Business PC" altname="" enabled="false" />
+ 		<model id="6893875" name="HP EliteDesk 705 G1 Small Form Factor PC" altname="HP EliteDesk 705 G1 SFF" enabled="true" />
+ 		<model id="6893882" name="HP EliteDesk 705 G1 Microtower PC" altname="HP EliteDesk 705 G1 MT" enabled="true" />
+ 		<model id="6893889" name="HP EliteDesk 705 G1 Desktop Mini PC" altname="" enabled="false" />
+ 		<model id="6953323" name="HP EliteOne 705 G1 23-inch Non-Touch All-in-One PC" altname="" enabled="false" />
+ 		<model id="7263074" name="HP EliteDesk 700 G1 Microtower PC" altname="" enabled="false" />
+ 		<model id="7263126" name="HP EliteDesk 700 G1 Small Form Factor PC" altname="" enabled="false" />
+ 		<model id="7633236" name="HP EliteDesk 705 G2 Desktop Mini PC" altname="" enabled="false" />
+ 		<model id="7633247" name="HP EliteDesk 705 G2 Microtower PC" altname="HP EliteDesk 705 G2 MT" enabled="true" />
+ 		<model id="7633258" name="HP EliteDesk 705 G2 Small Form Factor PC" altname="HP EliteDesk 705 G2 SFF" enabled="true" />
+ 		<model id="7638308" name="HP EliteOne 705 G2 23-inch Touch All-in-One PC" altname="" enabled="false" />
+ 		<model id="8737476" name="HP RP9 G1 Retail System Model 9015" altname="" enabled="false" />
+ 		<model id="8737485" name="HP RP9 G1 Retail System Model 9018" altname="" enabled="false" />
+ 		<model id="7553464" name="HP MP9 Retail System Model 9000" altname="" enabled="false" />
+ 		<model id="8592337" name="HP MP9 G2 Retail System" altname="" enabled="false" />
+ 		<model id="9702910" name="HP ENVY Pro Curved All-in-One Desktop PC" altname="" enabled="false" />
+ 		<model id="1152416" name="HP BladeSystem bc1500 Blade PC" altname="" enabled="false" />
+ 		<model id="3436008" name="HP BladeSystem bc2000 Blade PC" altname="" enabled="false" />
+ 		<model id="3436098" name="HP BladeSystem bc2500 Blade PC" altname="" enabled="false" />
+ 		<model id="3882617" name="HP BladeSystem bc2200 Blade PC" altname="" enabled="false" />
+ 		<model id="3882727" name="HP BladeSystem bc2800 Blade PC" altname="HP Blade PC bc2800" enabled="true" />
+ 		<model id="5210927" name="HP Folio 13 Notebook PC" altname="" enabled="false" />
+ 		<model id="5271147" name="HP EliteBook Folio 9470m Ultrabook" altname="HP EliteBook Folio 9470m" enabled="true" />
+ 		<model id="5271153" name="HP ENVY Pro Ultrabook" altname="" enabled="false" />
+ 		<model id="5271158" name="HP Spectre XT Pro Ultrabook" altname="" enabled="false" />
+ 		<model id="5449289" name="HP Spectre 13 x2 Pro PC" altname="" enabled="false" />
+ 		<model id="6658179" name="HP Spectre 13 Pro Notebook PC" altname="" enabled="false" />
+ 		<model id="7611210" name="HP Spectre Pro x360 G1 Convertible PC" altname="" enabled="true" />
+ 		<model id="8737499" name="HP Spectre Pro x360 G2 Convertible PC" altname="" enabled="true" />
+ 		<model id="5298040" name="HP EliteBook Revolve 810 G1 Tablet" altname="HP EliteBook Revolve 810 G1" enabled="true" />
+ 		<model id="6617055" name="HP EliteBook Revolve 810 G2 Tablet" altname="HP EliteBook Revolve 810 G2" enabled="true" />
+ 		<model id="7429242" name="HP EliteBook Revolve 810 G3 Tablet" altname="HP EliteBook Revolve 810 G3" enabled="true" />
+ 		<model id="5160459" name="HP Slate 2 Tablet PC" altname="" enabled="false" />
+ 		<model id="6990295" name="HP Slate 8 Pro Business Tablet" altname="" enabled="false" />
+ 		<model id="5298030" name="HP ElitePad 900 G1 Tablet" altname="" enabled="false" />
+ 		<model id="6629140" name="HP ElitePad 1000 G2 Tablet" altname="" enabled="false" />
+ 		<model id="7468170" name="HP ElitePad 1000 G2 Healthcare Tablet" altname="" enabled="false" />
+ 		<model id="7468175" name="HP ElitePad 1000 G2 Rugged Tablet" altname="" enabled="false" />
+ 		<model id="5387513" name="HP ZBook 17 Mobile Workstation" altname="" enabled="false" />
+ 		<model id="6978823" name="HP ZBook 17 G2 Mobile Workstation" altname="" enabled="false" />
+ 		<model id="8693766" name="HP ZBook 17 G3 Mobile Workstation" altname="" enabled="false" />
+ 		<model id="5387801" name="HP ZBook 15 Mobile Workstation" altname="" enabled="false" />
+ 		<model id="6978816" name="HP ZBook 15 G2 Mobile Workstation" altname="" enabled="false" />
+ 		<model id="7152803" name="HP ZBook 15u G2 Mobile Workstation" altname="" enabled="false" />
+ 		<model id="8693771" name="HP ZBook 15 G3 Mobile Workstation" altname="" enabled="false" />
+ 		<model id="8693778" name="HP ZBook 15u G3 Mobile Workstation" altname="" enabled="false" />
+ 		<model id="5403904" name="HP ZBook 14 Mobile Workstation" altname="" enabled="false" />
+ 		<model id="6978809" name="HP ZBook 14 G2 Mobile Workstation" altname="" enabled="false" />
+ 		<model id="7805650" name="HP OMEN Pro Mobile Workstation" altname="" enabled="false" />
+ 		<model id="8934840" name="HP ZBook Studio G3 Mobile Workstation" altname="" enabled="false" />
+ 		<model id="6453900" name="HP Chromebook 14 G1" altname="" enabled="false" />
+ 		<model id="6884737" name="HP Pro Tablet 610 G1 PC" altname="" enabled="false" />
+ 		<model id="7484084" name="HP Pro Tablet 608 G1" altname="" enabled="false" />
+ 		<model id="7398585" name="HP Pro Slate 8 Tablet" altname="" enabled="false" />
+ 		<model id="7398649" name="HP Pro Slate 12 Tablet" altname="" enabled="false" />
+ 		<model id="7484077" name="HP Pro Tablet 408 G1" altname="" enabled="false" />
+ 		<model id="7521934" name="HP Pro Tablet 10 EE G1" altname="" enabled="false" />
+ 		<model id="7521940" name="HP Pro Slate 10 EE G1 Tablet" altname="" enabled="false" />
+ 		<model id="7973299" name="HP Pro Slate 10 EE G1 Healthcare" altname="" enabled="false" />
+ 		<model id="7527385" name="HP Stream 11 Pro Notebook PC" altname="" enabled="false" />
+ 		<model id="8667890" name="HP Stream 11 Pro G2 Notebook PC" altname="" enabled="false" />
+
+	</models>
+	<categories>
+		<category name="Driver - Graphics" enabled="true" />
+ 		<category name="Driver - Controller" enabled="true" />
+ 		<category name="Operating System - Enhancements and QFEs" enabled="false" />
+ 		<category name="BIOS" enabled="false" />
+ 		<category name="Driver - Network" enabled="true" />
+ 		<category name="Operating System - Enhancements" enabled="false" />
+ 		<category name="Driver - Keyboard, Mouse and Input Devices" enabled="true" />
+ 		<category name="Software - Multimedia" enabled="false" />
+ 		<category name="Driver - Audio" enabled="true" />
+ 		<category name="Driver - Chipset" enabled="true" />
+ 		<category name="Software - System Management" enabled="false" />
+ 		<category name="Software - Security" enabled="false" />
+ 		<category name="ROMPAQ" enabled="false" />
+ 		<category name="Driver - Graphics - Nvidia" enabled="false" />
+ 		<category name="Utility - Tools" enabled="false" />
+ 		<category name="Firmware" enabled="false" />
+ 		<category name="Driver - Storage" enabled="true" />
+ 		<category name="Driver - Graphics - AMD" enabled="false" />
+ 		<category name="Driver - Graphics - Matrox" enabled="false" />
+ 		<category name="Software" enabled="false" />
+ 		<category name="Driver - Modem" enabled="false" />
+ 		<category name="Software - Solutions" enabled="false" />
+ 		<category name="Workstation ISV Certified Drivers - Graphics - NVIDIA" enabled="false" />
+ 		<category name="Workstation ISV Certified Drivers - Graphics - AMD" enabled="false" />
+ 		<category name="Software - PoS - MSR" enabled="false" />
+ 		<category name="Software - PoS" enabled="false" />
+ 		<category name="Driver - Printer" enabled="false" />
+ 		<category name="Driver - Display" enabled="false" />
+ 		<category name="Diagnostic" enabled="false" />
+ 		<category name="Software - PoS - Receipt Printer" enabled="false" />
+ 		<category name="Software - PoS - Scanner" enabled="false" />
+ 		<category name="Software - Internet Access" enabled="false" />
+ 		<category name="Software - PoS - Keyboard" enabled="false" />
+ 		<category name="Software - PoS - Pole (Line) Display" enabled="false" />
+ 		<category name="Software - Support Pack" enabled="false" />
+ 		<category name="Driver - Graphics - Intel" enabled="false" />
+ 		<category name="Manageability - Driver Pack" enabled="false" />
+ 		<category name="Software - Smart Jackets" enabled="false" />
+ 		<category name="Driver - Driver Pack" enabled="false" />
+ 		<category name="Driver - Graphics - HP" enabled="false" />
+ 		<category name="Software - Restore CD" enabled="false" />
+ 		<category name="Driver - Add-Ons" enabled="false" />
+ 		<category name="Driver - Scanner" enabled="false" />
+ 		<category name="Manageability - Tools" enabled="false" />
+
+	</categories>
+</config>
