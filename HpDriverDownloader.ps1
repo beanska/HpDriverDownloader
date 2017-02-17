@@ -37,7 +37,7 @@
 param
 (
 	[Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, Mandatory = $false)]
-	[String] $cfgFile,
+	[String]$cfgFile,
 
 	#[Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
 	#[String]$outDir,
@@ -45,7 +45,7 @@ param
 	#[Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
 	#[switch]$UseSymLinks,
 
-	#[Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
+	[Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
 	[switch]$Update
 )
 
@@ -63,27 +63,8 @@ if ($Script:cfgFile -eq ""){$Script:cfgFile = "$PSScriptRoot\config.xml"}
 
 function main {
 	cls
-
-	Write-Output "Loading configuration from $cfgFile..."
-	$config = ([xml](gc $cfgFile)).config
-
-			if ($config.OutDir.length -gt 0){
-				$Script:outDir = $config.OutDir
-			} else {
-				$Script:outDir = "$PSScriptRoot\Softpaqs"
-			}
-			
-			if ($config.OutputStructure.length -gt 0){
-				$Script:outStruct = $config.OutputStructure
-			} else {
-				#Output hardlinks by default
-				$Script:outStruct = '3'
-			}
 	
-	write-host $Update
-
 	if ($Update) {
-		write-host "Update mode"
 		if ((!(Test-Path "$outDir\ProductCatalog\modelcatalog.xml"))) {
 			Write-Verbose "No catalog found Downloading and extracting."
 			DownloadCatalog -DownloadDir "$outDir"
@@ -94,13 +75,11 @@ function main {
 			DownloadCatalog -DownloadDir "$outDir\temp"
 			$newModelCatalog = Get-ModelCatalog -CatalogDir "$outDir\temp\ProductCatalog"
 			$modelCatalog = Get-ModelCatalog -CatalogDir "$outDir\ProductCatalog"
-			"Current catalog version: $($modelCatalog.CatalogVersion) Downloaded catalog version: $($newModelCatalog.CatalogVersion)"
+			Write-Verbose "Found new catalog version $($newModelCatalog.CatalogVersion). ($($newModelCatalog.CatalogVersion)>$($modelCatalog.CatalogVersion))"
 			if ( ([version]($newModelCatalog.CatalogVersion)) -gt ([version]($modelCatalog.CatalogVersion)) ) {
-				Write-Verbose "Downloaded catalog is newer, updating..."
+				Write-Verbose "Found new catalog version $($newModelCatalog.CatalogVersion). ($($newModelCatalog.CatalogVersion)>$($modelCatalog.CatalogVersion))"
 				Try {
-                    Write-Verbose "Removing old catalog"
-					Remove-Item "$outDir\ProductCatalog" -Recurse -Force 
-                    Write-Verbose "Copying new catalog"
+					Remove-Item Remove-Item -Recurse -Force "$outDir\ProductCatalog"
 					Copy-Item "$outDir\temp\ProductCatalog" "$outDir\ProductCatalog" -Recurse
 					$modelCatalog = $newModelCatalog
 				} Catch {
@@ -120,8 +99,8 @@ function main {
 		} else {
 		#>
 			
-			<# Write-Output "Loading configuration from $cfgFile..."
-			$config = ([xml](gc $cfgFile)).config #>
+			Write-Output "Loading configuration from $cfgFile..."
+			$config = ([xml](gc $cfgFile)).config
 			
 			if ($config.OutDir.length -gt 0){
 				$Script:outDir = $config.OutDir
@@ -328,14 +307,14 @@ function BuildConfig {
 		# Backup config
 		Copy-Item -Path $ConfigFilePath -Destination "$ConfigFilePath.old" -Force
 		
-		# Read current config
-		$curConfig = ([xml](gc $ConfigFilePath)).config
+		# Read currennt config
+		$curConfig = ([xml](gc "C:\Users\e139068.HOUTX\Documents\Scripts\HP\HpDriverDownloader\testconfig.xml")).config
 		
 		# Find enabled settings in the current catalog
 		$langDiff = @($curConfig.languages.language | where { $_.enabled -eq 'true' })
 		$osDiff = @($curConfig.operatingsystems.os | where { $_.enabled -eq 'true' })
 		$modDiff = @($curConfig.models.model | where { $_.enabled -eq 'true' })
- 		$catDiff = @($curConfig.categories.category | where { $_.enabled -eq 'true' })
+		$catDiff = @($curConfig.categories.category | where { $_.enabled -eq 'true' })
 	}
 	
 	# Build xml for new config
@@ -360,9 +339,10 @@ function BuildConfig {
 	$models = @()
 	foreach ($entry in ($catalog.Models.Values)) {
 		if ($modDiff.Id -contains $entry.Id) {
-			$models += "`t`t<model id=""$($entry.Id)"" name=""$(Escape($entry.Name))"" altname=""$(Escape($entry.altname))"" enabled=""true"" />`n"
+			$altName = $curConfig.models.model | ? { $_.id -eq $entry.Id } | select -expandproperty altname
+			$models += "`t`t<model id=""$($entry.Id)"" name=""$(Escape($entry.Name))"" altname=""$altName"" enabled=""true"" />`n"
 		} else {
-			$models += "`t`t<model id=""$($entry.Id)"" name=""$(Escape($entry.Name))"" altname=""$(Escape($entry.altname))"" enabled=""false"" />`n"
+			$models += "`t`t<model id=""$($entry.Id)"" name=""$(Escape($entry.Name))"" altname="""" enabled=""false"" />`n"
 		}
 	}
 	
@@ -509,8 +489,7 @@ function ProcessCatalog {
 					'ModelId' = $sp.ParentNode.ParentNode.ParentNode.Id
 					'ModelName' = ($ModelCatalog.Models)[$sp.ParentNode.ParentNode.ParentNode.Id].Name
 					#'ModelCustomName' = ($ModelCatalog.Models)[$sp.ParentNode.ParentNode.ParentNode.Id].altname
-					#'ModelCustomName' = ($Config.models.model | ? {$_.name -eq (($ModelCatalog.Models)[$sp.ParentNode.ParentNode.ParentNode.Id].Name)} | select -expandproperty altname)
-                    'ModelCustomName' = ($Config.models.model | ? {$_.name -eq (($ModelCatalog.Models)[$sp.ParentNode.ParentNode.ParentNode.Id].Name)}).altname.name
+					'ModelCustomName' = ($Config.models.model | ? {$_.name -eq (($ModelCatalog.Models)[$sp.ParentNode.ParentNode.ParentNode.Id].Name)} | select -expandproperty altname)
 					'FileStatus' = ''
 					'Status' = ''
 				});
@@ -560,48 +539,42 @@ function Create-DriverStructure {
 		[string]$OutDir
 	)
 
-     #$Queue.Value  | Out-GridView
+     $Queue.Value  | Out-GridView
 	
 	foreach ($entry in ($Queue.Value | where { $_.FileStatus -eq 'Extracted' })) {
         
 		$drvTitle = "$($entry.SoftpaqName) ($($entry.SoftpaqVersion))"
-		
-        if ($entry.ModelCustomName -is [system.array]){
-            $symDir = $entry.ModelCustomName | % {
-                "$outDir\Drivers\$($entry.OsShortName)\$_"
-            }
-            
-        } elseif ($entry.ModelCustomName.length -gt 1) {
-            $symDir = @("$outDir\Drivers\$($entry.OsShortName)\$($entry.ModelCustomName)")
-        } else {
-            $symDir = @("$outDir\Drivers\$($entry.OsShortName)\$($entry.ModelName)")
+		if ($entry.ModelCustomName.length -gt 1) {
+			#$symDir = "$outDir\$($entry.LangName)\$($entry.OsShortName)\$($entry.ModelCustomName)"
+            $symDir = "$outDir\Drivers\$($entry.OsShortName)\$($entry.ModelCustomName)"
+		} else {
+			#$symDir = "$outDir\$($entry.LangName)\$($entry.OsShortName)\$($entry.ModelName)"
+            $symDir = "$outDir\Drivers\$($entry.OsShortName)\$($entry.ModelName)"
 		}
-
 		$spDir = "$outDir\softpaq\sp$($entry.SoftpaqId)"
-
-        foreach ($sd in $symDir){
 		
-		    if (!(Test-Path $sd)) {
-                write-host "Creating path ""$sd\$drvTitle"""
-			    Try {
-                    New-Item -Path "$sd\$drvTitle" -ItemType directory -ErrorAction Stop    
-                    Create-Hardlinks -outDir "$sd\$drvTitle" -spDir $spDir            
-                } Catch {
-                    Write-error "Unable to create directory`n$_"
-                }
-		    }
-
-            
-		
-		    #Junction points
-		    <#
-		    if (!(Test-Path "$symDir\$drvTitle")) {
-			    New-SymLink -Path $spDir -SymName "$symDir\$drvTitle" -Directory | Out-Null
-		    }
-		    #>
-		
-		    #New-HardLink -Link "$symDir\$drvTitle" -Target $spDir
+		if (!(Test-Path $symDir)) {
+            write-host "creating path ""$symDir\$drvTitle"""
+			Try {
+                #New-Item -Path $symDir -ItemType directory -ErrorAction Stop 
+                New-Item -Path "$symDir\$drvTitle" -ItemType directory -ErrorAction Stop 
+                
+            } Catch {
+                Write-error "Unable to create directory`n$_"
+            }
 		}
+
+        Create-Hardlinks -outDir "$symDir\$drvTitle" -spDir $spDir
+		
+		#Junction points
+		<#
+		if (!(Test-Path "$symDir\$drvTitle")) {
+			New-SymLink -Path $spDir -SymName "$symDir\$drvTitle" -Directory | Out-Null
+		}
+		#>
+		
+		#New-HardLink -Link "$symDir\$drvTitle" -Target $spDir
+		
 		
 	}
 	
