@@ -40,12 +40,6 @@ param
 	[String] $cfgFile,
 
 	#[Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
-	#[String]$outDir,
-
-	#[Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
-	#[switch]$UseSymLinks,
-
-	#[Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
 	[switch]$Update
 )
 
@@ -60,9 +54,7 @@ $mycreds = New-Object System.Management.Automation.PSCredential ("anonymous", $s
 #Set Globals
 if ($Script:cfgFile -eq ""){$Script:cfgFile = "$PSScriptRoot\config.xml"}
 
-
 function main {
-	cls
 
 	Write-Output "Loading configuration from $cfgFile..."
 	$config = ([xml](gc $cfgFile)).config
@@ -80,15 +72,13 @@ function main {
 				$Script:outStruct = '3'
 			}
 	
-	write-host $Update
-
 	if ($Update) {
 		write-host "Update mode"
 		if ((!(Test-Path "$outDir\ProductCatalog\modelcatalog.xml"))) {
 			Write-Verbose "No catalog found Downloading and extracting."
 			DownloadCatalog -DownloadDir "$outDir"
 			$modelCatalog = Get-ModelCatalog -CatalogDir "$outDir\ProductCatalog"
-			BuildConfig -ConfigTemplatePath "$PSScriptRoot\config.template.xml" -Catalog $modelCatalog -ConfigFilePath $cfgFile
+			Build-Config -ConfigTemplatePath "$PSScriptRoot\config.template.xml" -Catalog $modelCatalog -ConfigFilePath $cfgFile
 		} else {
 			Write-Verbose "Checking for new catalog from HP."
 			DownloadCatalog -DownloadDir "$outDir\temp"
@@ -106,7 +96,7 @@ function main {
 				} Catch {
 					Throw $Error.Exception
 				}
-				BuildConfig -ConfigTemplatePath "$PSScriptRoot\config.template.xml" -Catalog $modelCatalog -ConfigFilePath $cfgFile -Update
+				Build-Config -ConfigTemplatePath "$PSScriptRoot\config.template.xml" -Catalog $modelCatalog -ConfigFilePath $cfgFile -Update
 				
 			}
 		}
@@ -307,93 +297,108 @@ function Escape {
 	return [System.Security.SecurityElement]::Escape($string)
 }
 
-function BuildConfig {
+function Update-Configuration {
 	[CmdletBinding(DefaultParameterSetName = 'New')]
 	param
 	(
 		[Parameter(Mandatory = $true,
 				   Position = 0)]
 		[hashtable]$Catalog,
+
 		[Parameter(Mandatory = $true,
 				   Position = 1)]
 		[string]$ConfigFilePath,
+
 		[Parameter(Mandatory = $true,
 				   Position = 2)]
 		[string]$ConfigTemplatePath,
+
 		[Parameter(Position = 3)]
 		[switch]$Update
 	)
-	
-	if ($Update) {
-		# Backup config
-		Copy-Item -Path $ConfigFilePath -Destination "$ConfigFilePath.old" -Force
-		
-		# Read current config
-		$curConfig = ([xml](gc $ConfigFilePath)).config
-		
-		# Find enabled settings in the current catalog
-		$langDiff = @($curConfig.languages.language | where { $_.enabled -eq 'true' })
-		$osDiff = @($curConfig.operatingsystems.os | where { $_.enabled -eq 'true' })
-		$modDiff = @($curConfig.models.model | where { $_.enabled -eq 'true' })
- 		$catDiff = @($curConfig.categories.category | where { $_.enabled -eq 'true' })
+	[xml]$cfg = New-Object system.Xml.XmlDocument
+
+	if (test-path -Path $ConfigFilePath){
+		[xml] $newCfg = @"
+		<?xml version="1.0"?>
+		<config CatalogVersion="1.0.4.0" OutDir="E:\Drivers" OutputStructure="3">
+			<languages></languages>
+			<operatingsystems></operatingsystems>
+			<models></models>
+			<categories></categories>
+		</config>
+"@
+		$newCfg.Save($ConfigFilePath)
 	}
+
+}
+
+function Build-Config {
+	[CmdletBinding(DefaultParameterSetName = 'New')]
+	param
+	(
+		[Parameter(Mandatory = $true, Position = 0)]
+		[hashtable]$Catalog,
+		
+		[Parameter(Mandatory = $true, Position = 1)]
+		[string]$ConfigFilePath,
+		
+		[Parameter(Mandatory = $true, Position = 2)]
+		[string]$ConfigTemplatePath, 
+		
+		[Parameter(Position = 3)]
+		[switch]$Update
+	)
+
+	$xmlDoc = [System.Xml.XmlDocument](Get-Content $ConfigFilePath);
 	
-	# Build xml for new config
-	$languages = @()
+	# Find enabled settings in the current catalog
+	$langDiff = @($curConfig.languages.language | where { $_.enabled -eq 'true' })
+	$osDiff = @($curConfig.operatingsystems.os | where { $_.enabled -eq 'true' })
+	$modDiff = @($curConfig.models.model | where { $_.enabled -eq 'true' })
+	$catDiff = @($curConfig.categories.category | where { $_.enabled -eq 'true' })
+
 	foreach ($entry in ($catalog.Languages.Values)) {
-		if ($langDiff.Id -contains $entry.Id) {
-			$languages += "`t`t<language id=""$($entry.Id)"" name=""$(Escape($entry.Name))"" enabled=""true"" />`n"
-		} else {
-			$languages += "`t`t<language id=""$($entry.Id)"" name=""$(Escape($entry.Name))"" enabled=""false"" />`n"
-		}
+		if ($xmlDoc.config.Id -notcontains $entry.Id) {
+			$newEntry = $xmlDoc.config.models.AppendChild($xmlDoc.CreateElement("model"))
+			$newEntry.SetAttribute("id",$entry.Id)
+			$newEntry.SetAttribute("name","$(Escape($entry.Name))")
+			$newEntry.SetAttribute("enabled","false")
+		} 
 	}
-	
-	$oses = @()
-	foreach ($entry in ($Catalog.OperatingSystems.Values)) {
-		if ($osDiff.Id -contains $entry.Id) {
-			$oses += "`t`t<os id=""$($entry.Id)"" name=""$(Escape($entry.Name))"" enabled=""true"" />`n"
-		} else {
-			$oses += "`t`t<os id=""$($entry.Id)"" name=""$(Escape($entry.Name))"" enabled=""false"" />`n"
-		}
+
+	foreach ($entry in ($catalog.OperatingSystems.Values)) {
+		if ($xmlDoc.config.operatingsystems.os.id -notcontains $entry.Id) {
+			$newEntry = $xmlDoc.config.operatingsystems.AppendChild($xmlDoc.CreateElement("os"))
+			$newEntry.SetAttribute("id",$entry.Id)
+			$newEntry.SetAttribute("name","$(Escape($entry.Name))")
+			$newEntry.SetAttribute("enabled","false")
+		} 
 	}
-	
-	$models = @()
+
 	foreach ($entry in ($catalog.Models.Values)) {
-		if ($modDiff.Id -contains $entry.Id) {
-			#$altName = $curConfig.models.model | ? { $_.id -eq $entry.Id } | select -expandproperty altname
-			$models += "`t`t<model id=""$($entry.Id)"" name=""$(Escape($entry.Name))"" enabled=""true"" >`n"
-		} else {
-			$models += "`t`t<model id=""$($entry.Id)"" name=""$(Escape($entry.Name))"" enabled=""false"" >`n"
-		}
-
-		foreach ($altname in ($curConfig.models.model | ? { $_.id -eq $entry.Id } | select-object altname) ){
-			$models += "<altname name=""$($altName.name)"" />"
-		}
-
-		$models += "</model>`n"
+		$curConfig.models.model.id
+		
+		if ($xmlDoc.config.models.model.id -notcontains $entry.Id) {
+			$newEntry = $xmlDoc.config.models.AppendChild($xmlDoc.CreateElement("model"))
+			$newEntry.SetAttribute("id",$entry.Id)
+			$newEntry.SetAttribute("name","$(Escape($entry.Name))")
+			$newEntry.SetAttribute("enabled","false")
+		} 
 	}
-	
-	$categories = @()
+
 	foreach ($entry in ($modelCatalog.Softpaqs.Values.Category | select -Unique)) {
-		if ($catDiff.Name -contains $entry) {
-			$categories += "`t`t<category name=""$entry"" enabled=""true"" />`n"
-		} else {
-			$categories += "`t`t<category name=""$entry"" enabled=""false"" />`n"
-		}
+		if ($xmlDoc.categories.category.config.Id -notcontains $entry.Id) {
+			$newEntry = $xmlDoc.config.models.AppendChild($xmlDoc.CreateElement("model"))
+			$newEntry.SetAttribute("id",$entry.Id)
+			$newEntry.SetAttribute("name","$(Escape($entry.Name))")
+			$newEntry.SetAttribute("enabled","false")
+		} 
 	}
-	
-	# Transform template into new config
-	$cfgData = (gc $ConfigTemplatePath)
-	$cfgData = $cfgData.replace('<!languages!>', $languages)
-	$cfgData = $cfgData.replace('<!operatingsystems!>', $oses)
-	$cfgData = $cfgData.replace('<!models!>', $models)
-	$cfgData = $cfgData.replace('<!categories!>', $categories)
-	$cfgData = $cfgData.replace('<!catver!>', $catalog.CatalogVersion)
-	$cfgData = $cfgData.replace('<!outdir!>', $catalog.OutDir)
-	$cfgData = $cfgData.replace('<!outstruct!>', $catalog.OutputStructure)
-	
-	# Write new config file
-	$cfgData | Out-File $ConfigFilePath -Force -Encoding utf8
+
+	$xmlDoc.config.CatalogVersion = ( $catalog.CatalogVersion.ToString() )
+	$xmlDoc.Save($ConfigFilePath);
+
 }
 
 function Get-ModelCatalog {
