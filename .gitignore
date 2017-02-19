@@ -7,3 +7,4 @@ goodconfig.xml
 ChangeXML.ps1
 *.db
 *.onetoc2
+*.xml
