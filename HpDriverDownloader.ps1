@@ -352,12 +352,6 @@ function Build-Config {
 
 	$xmlDoc = [System.Xml.XmlDocument](Get-Content $ConfigFilePath);
 	
-	# Find enabled settings in the current catalog
-	$langDiff = @($curConfig.languages.language | where { $_.enabled -eq 'true' })
-	$osDiff = @($curConfig.operatingsystems.os | where { $_.enabled -eq 'true' })
-	$modDiff = @($curConfig.models.model | where { $_.enabled -eq 'true' })
-	$catDiff = @($curConfig.categories.category | where { $_.enabled -eq 'true' })
-
 	foreach ($entry in ($catalog.Languages.Values)) {
 		if ($xmlDoc.config.Id -notcontains $entry.Id) {
 			$newEntry = $xmlDoc.config.models.AppendChild($xmlDoc.CreateElement("model"))
