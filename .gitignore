@@ -8,3 +8,6 @@ ChangeXML.ps1
 *.db
 *.onetoc2
 *.xml
+.vscode/launch.json
+.vscode/launch.json
+*.json
