@@ -127,7 +127,11 @@ function main {
 			}
 			
 			Write-Output "Loading catalog..."
-			$modelCatalog = Get-ModelCatalog -CatalogDir "$outDir\ProductCatalog"
+			if (test-path "$($config.OutDir)\Catalog.xml"){
+				$modelCatalog = Import-Clixml "$($config.OutDir)\Catalog.xml"
+			} else {
+				$modelCatalog = Get-ModelCatalog -CatalogDir "$outDir\ProductCatalog"
+			}
 			
 			Write-Output "Process the catalog against our configuration to build a processing queue..."
 			$queue = (ProcessCatalog -ModelCatalog $modelCatalog -Config $config -CatalogDir "$outDir\ProductCatalog") |
@@ -354,7 +358,7 @@ function Build-Config {
 	
 	foreach ($entry in ($catalog.Languages.Values)) {
 		if ($xmlDoc.config.Id -notcontains $entry.Id) {
-			$newEntry = $xmlDoc.config.models.AppendChild($xmlDoc.CreateElement("model"))
+			$newEntry = $xmlDoc.config.models.AppendChild($xmlDoc.CreateElement("language"))
 			$newEntry.SetAttribute("id",$entry.Id)
 			$newEntry.SetAttribute("name","$(Escape($entry.Name))")
 			$newEntry.SetAttribute("enabled","false")
@@ -365,7 +369,6 @@ function Build-Config {
 		if ($xmlDoc.config.operatingsystems.os.id -notcontains $entry.Id) {
 			$newEntry = $xmlDoc.config.operatingsystems.AppendChild($xmlDoc.CreateElement("os"))
 			$newEntry.SetAttribute("id",$entry.Id)
-			$newEntry.SetAttribute("name","$(Escape($entry.Name))")
 			$newEntry.SetAttribute("enabled","false")
 		} 
 	}
@@ -383,10 +386,10 @@ function Build-Config {
 
 	foreach ($entry in ($modelCatalog.Softpaqs.Values.Category | select -Unique)) {
 		if ($xmlDoc.categories.category.config.Id -notcontains $entry.Id) {
-			$newEntry = $xmlDoc.config.models.AppendChild($xmlDoc.CreateElement("model"))
-			$newEntry.SetAttribute("id",$entry.Id)
-			$newEntry.SetAttribute("name","$(Escape($entry.Name))")
-			$newEntry.SetAttribute("enabled","false")
+			$newEntry = $xmlDoc.config.models.AppendChild($xmlDoc.CreateElement("category"))
+			$newEntry.SetAttribute("id", $entry.Id)
+			$newEntry.SetAttribute("name", "$(Escape($entry.Name))")
+			$newEntry.SetAttribute("enabled", "false")
 		} 
 	}
 
@@ -481,21 +484,15 @@ function ProcessCatalog {
 	$cfgCat = ($Config.categories.category | where { $_.enabled -eq 'true' })
 	$cfgModel = $Config.models.model | where { $_.enabled -eq 'true' }
 
-
 	$files = (gci $catalogDir | where { $_.Name -ne 'modelcatalog.xml' } | where { $cfgModel.Id -contains $_.BaseName })
 
 	foreach ($file in $files) {
 		Write-host "Processing catalog file $($file.Name)"
 		
-		
         $sps = ((([xml](gc $file.FullName)).NewDataSet.ProductCatalog.ProductModel.OS |
 		    where { $cfgOs.id -contains $_.Id }).Lang |
 		    where { $_.Id -eq '13' }).SP #| where { $_.S -eq '0' }
         
-
-
-      # $catalogContent.NewDataSet.ProductCatalog.ProductModel.OS | Out-GridView
-		
 		foreach ($sp in $SPs) {
 			if (($cfgCat.name) -contains (($ModelCatalog.Softpaqs)[$sp.Id].Category)) {
 				$processedData += New-Object -TypeName PSObject -Property ([Ordered]@{
@@ -504,6 +501,7 @@ function ProcessCatalog {
 					'OsId' = $sp.ParentNode.ParentNode.Id
 					'OsName' = ($ModelCatalog.OperatingSystems)[$sp.ParentNode.ParentNode.Id].Name
 					'OsShortName' = ($ModelCatalog.OperatingSystems)[$sp.ParentNode.ParentNode.Id].ssmname
+					#'OsFolder' = ($Config.operatingsystems.os | ? {$_.name -eq (($ModelCatalog.Models)[$sp.ParentNode.ParentNode.ParentNode.Id].Name)}).altname.name
 					'SoftpaqId' = $sp.Id
 					'SoftpaqName' = ($ModelCatalog.Softpaqs)[$sp.Id].Name
 					'SoftpaqUrl' = ($ModelCatalog.Softpaqs)[$sp.Id].Url
@@ -524,7 +522,8 @@ function ProcessCatalog {
 		}
 	}
 	#$processedData | export-csv "$psScriptroot\procData.csv"
-	$processedData | ConvertTo-Json | Out-File "$($Script:outDir)\Catalog.json" -Encoding 'utf8'
+	#$processedData | ConvertTo-Json | Out-File "$($Script:outDir)\Catalog.json" -Encoding 'utf8'
+	$processedData | Export-Clixml "$($Script:outDir)\Catalog.json" 
 }
 
 function Create-Hardlinks {
@@ -566,8 +565,6 @@ function Create-DriverStructure {
 		[string]$OutDir
 	)
 
-     #$Queue.Value  | Out-GridView
-	
 	foreach ($entry in ($Queue.Value | where { $_.FileStatus -eq 'Extracted' })) {
         
 		$drvTitle = "$($entry.SoftpaqName) ($($entry.SoftpaqVersion))"
@@ -575,8 +572,7 @@ function Create-DriverStructure {
         if ($entry.ModelCustomName -is [system.array]){
             $symDir = $entry.ModelCustomName | % {
                 "$outDir\Drivers\$($entry.OsShortName)\$_"
-            }
-            
+            }      
         } elseif ($entry.ModelCustomName.length -gt 1) {
             $symDir = @("$outDir\Drivers\$($entry.OsShortName)\$($entry.ModelCustomName)")
         } else {
