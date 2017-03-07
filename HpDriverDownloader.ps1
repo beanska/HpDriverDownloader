@@ -523,7 +523,7 @@ function ProcessCatalog {
 	}
 	#$processedData | export-csv "$psScriptroot\procData.csv"
 	#$processedData | ConvertTo-Json | Out-File "$($Script:outDir)\Catalog.json" -Encoding 'utf8'
-	$processedData | Export-Clixml "$($Script:outDir)\Catalog.json" 
+	$processedData | Export-Clixml "$($Script:outDir)\ProcessedCatalog.xml" 
 }
 
 function Create-Hardlinks {
