@@ -57,6 +57,7 @@ if ($Script:cfgFile -eq ""){$Script:cfgFile = "$PSScriptRoot\config.xml"}
 function main {
 
 	Write-Output "Loading configuration from $cfgFile..."
+	$prepedCatalog = "$($config.OutDir)\ProcessedCatalog.xml"
 	$config = ([xml](gc $cfgFile)).config
 
 			if ($config.OutDir.length -gt 0){
@@ -127,11 +128,11 @@ function main {
 			}
 			
 			Write-Output "Loading catalog..."
-			if (test-path "$($config.OutDir)\Catalog.xml"){
-				$modelCatalog = Import-Clixml "$($config.OutDir)\Catalog.xml"
-			} else {
+			#if (test-path $prepedCatalog){
+			#	$modelCatalog = Import-Clixml $prepedCatalog
+			#} else {
 				$modelCatalog = Get-ModelCatalog -CatalogDir "$outDir\ProductCatalog"
-			}
+			#}
 			
 			Write-Output "Process the catalog against our configuration to build a processing queue..."
 			$queue = (ProcessCatalog -ModelCatalog $modelCatalog -Config $config -CatalogDir "$outDir\ProductCatalog") |
@@ -140,6 +141,8 @@ function main {
 			
 			Write-Output "Download the requisite Softpaqs..."
 			DownloadandExtractSoftpaqs -Queue ([ref]$queue) -OutDir $outDir
+
+			$queue | Export-Clixml "$($Script:outDir)\ProcessedCatalog.xml"
 			
 			Write-Output "Building driver structure..."
 			Switch ($Script:ourStruct){
@@ -162,31 +165,31 @@ function DownloadandExtractSoftpaqs {
 		[string]$OutDir
 	)
 	
-	foreach ($sp in ($Queue.Value | select -Unique SoftpaqId, SoftpaqUrl, SoftpaqName)) {
+	foreach ($sp in ($Queue.Value) ) {
 		$spFile = "$OutDir\Softpaq\sp$($sp.SoftpaqId).exe"
 		$spFldr = "$OutDir\Softpaq\sp$($sp.SoftpaqId)"
 		
-		# Download the SP if not already present
+		
 		if (Test-Path -PathType Container -Path $spFldr) {
-			$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Extracted' }
+			#$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Extracted' }
+			$sp.FileStatus = 'Extracted'
 		} elseif (Test-Path -Path $spFile) {
 			if (ExtractSoftpaq -SoftpaqPath $spFile -Destination $spFldr) {
-				$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Extracted' }
+				$sp.FileStatus = 'Extracted'
 			} else {
-				$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Error: Cannot extract' }
+				$sp.FileStatus = 'Error: Cannot extract'
 			}
 		} else {
 			try {
 				FtpDownload -RemoteFile $sp.SoftpaqUrl -Destination "$outDir\Softpaq" -Credentials $mycreds
 				ExtractSoftpaq -SoftpaqPath $spFile -Destination $spFldr
-				$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Extracted' }
+				$sp.FileStatus = 'Extracted'
 				Remove-Item $spFile -Force
 			} catch {
-				$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Error: Unable to download' }
-				$Queue.Value | where { $_.SoftpaqId -eq $sp.SoftpaqId } | foreach { $_.FileStatus = 'Error: Cannot extract' }
+				$sp.FileStatus = 'Error: Unable to download or extract' 
 			}
 		}
-		
+	
 	} #foreach
 }
 
@@ -494,6 +497,7 @@ function ProcessCatalog {
 		    where { $_.Id -eq '13' }).SP #| where { $_.S -eq '0' }
         
 		foreach ($sp in $SPs) {
+
 			if (($cfgCat.name) -contains (($ModelCatalog.Softpaqs)[$sp.Id].Category)) {
 				$processedData += New-Object -TypeName PSObject -Property ([Ordered]@{
 					'LangId' = $sp.ParentNode.Id;
@@ -523,7 +527,8 @@ function ProcessCatalog {
 	}
 	#$processedData | export-csv "$psScriptroot\procData.csv"
 	#$processedData | ConvertTo-Json | Out-File "$($Script:outDir)\Catalog.json" -Encoding 'utf8'
-	$processedData | Export-Clixml "$($Script:outDir)\ProcessedCatalog.xml" 
+	 
+	return $processedData
 }
 
 function Create-Hardlinks {
@@ -580,14 +585,15 @@ function Create-DriverStructure {
 		}
 
 		$spDir = "$outDir\softpaq\sp$($entry.SoftpaqId)"
+		
 
         foreach ($sd in $symDir){
-		
-		    if (!(Test-Path $sd)) {
-                write-host "Creating path ""$sd\$drvTitle"""
+			$spLink = "$sd\$drvTitle"
+		    if (!(Test-Path $spLink)) {
+                write-host "Creating path spLink"
 			    Try {
-                    New-Item -Path "$sd\$drvTitle" -ItemType directory -ErrorAction Stop    
-                    Create-Hardlinks -outDir "$sd\$drvTitle" -spDir $spDir            
+                    New-Item -Path $spLink -ItemType directory -ErrorAction Stop    
+                    Create-Hardlinks -outDir $spLink -spDir $spDir            
                 } Catch {
                     Write-error "Unable to create directory`n$_"
                 }
